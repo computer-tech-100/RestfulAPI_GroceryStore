@@ -10,6 +10,7 @@ using System;
 using System.Threading.Tasks;
 using Microsoft.Extensions.DependencyInjection;
 using System.ComponentModel.DataAnnotations;
+using MyApp.Core.Services;
 
 //The app should fail gracefully
 //Consider all possible aspects that user : test cases with all possible input and output
@@ -41,17 +42,17 @@ namespace MyApp.UnitTests
         [Fact]
         public void Get_WhenCalled_ReturnsAllProducts()
         {
-            using (var Context = new ShoppingCartContext(CreateNewContext()))
+            using (var context = new ShoppingCartContext(CreateNewContext()))
             {
                 //Arrange
-                Context.ProductTestData();//We make sure that dummy data has been added
-                var Controller = new ProductController(Context);//pass context inside controller
+                context.ProductTestData();//We make sure that dummy data has been added
+                var controller = new ProductController(context, new ProductService(context));//pass context and ProductService inside controller
 
                 //Act
-                var Results = Controller.Get();//call Get() function inside Procuct controller
+                var results = controller.Get();//call Get() function inside Procuct controller
 
                 //Assert
-                Assert.NotNull(Results);//make sure that Get Method returns value 
+                Assert.NotNull(results);//make sure that Get Method returns value 
             }
         }
 
@@ -60,17 +61,17 @@ namespace MyApp.UnitTests
         [Fact]
         public void GetById_ExistingIntIdPassed_ReturnsOkResult()
         {
-            using (var Context = new ShoppingCartContext(CreateNewContext()))
+            using (var context = new ShoppingCartContext(CreateNewContext()))
             {
                 //Arrange
-                Context.ProductTestData();//add dummy data
-                var Controller = new ProductController(Context);//pass Context inside controller
+                context.ProductTestData();//add dummy data
+                var controller = new ProductController(context, new ProductService(context));//pass context and ProductService inside controller
             
                 //Act
-                var OkResult = Controller.GetById(1);//1 is valid Id 
+                var okResult = controller.GetById(1);//1 is valid Id 
             
                 //Assert
-                Assert.IsType<OkObjectResult>(OkResult.Result);//When Id is valid the result is type of OkObjectResult
+                Assert.IsType<OkObjectResult>(okResult.Result);//When Id is valid the result is type of OkObjectResult
             }
         }
 
@@ -79,16 +80,16 @@ namespace MyApp.UnitTests
         [Fact]
         public void GetById_InvalidIdPassed_ReturnsNotFoundResult() 
         {
-            using (var Context = new ShoppingCartContext(CreateNewContext()))
+            using (var context = new ShoppingCartContext(CreateNewContext()))
             {
                 //Arrange
-                var Controller = new ProductController(Context);//pass context inside controller
+                var controller = new ProductController(context, new ProductService(context));//pass context and ProductService inside controller
 
                 //Act
-                var Not_Found_Result = Controller.GetById(-1);// -1 is Invalid Id
+                var not_Found_Result = controller.GetById(-1);// -1 is Invalid Id
 
                 //Assert
-                Assert.IsType<NotFoundResult>(Not_Found_Result.Result);
+                Assert.IsType<NotFoundResult>(not_Found_Result.Result);
             }
         }
 
@@ -97,46 +98,46 @@ namespace MyApp.UnitTests
         [Fact]
         public void GetById_ExistingIntIdPassed_ReturnsRightItem()
         {
-            using (var Context = new ShoppingCartContext(CreateNewContext()))
+            using (var context = new ShoppingCartContext(CreateNewContext()))
             {
                 //Arrange
-                Context.ProductTestData();//Add dummy data
-                var Controller = new ProductController(Context);//pass context inside controller
+                context.ProductTestData();//Add dummy data
+                var controller = new ProductController(context, new ProductService(context));//pass context and ProductService inside controller
 
                 //Act
-                var OkResult = Controller.GetById(1).Result as OkObjectResult;
+                var okResult = controller.GetById(1).Result as OkObjectResult;
             
                 //Assert
-                Assert.Equal("Oranges", (OkResult.Value as Product).ProductName);  
+                Assert.Equal("Oranges", (okResult.Value as Product).ProductName);  
             }
         }
 
         //Test Post() Method 
         //When Invalid object is passed 
         [Fact]
-        public void ProductModelValidation_ProductRequired()
+        public void ProductModelValidation_ProductNameRequired()
         {
             using (var Context = new ShoppingCartContext(CreateNewContext()))
             {
                 //Arrange
                 List<ValidationResult> result = new List<ValidationResult>(); 
 
-                //This Product does not contain Category hence the Product is invalid
-                var CategoryIsMissing = new Product()
+                //This Product does not contain ProductName hence the Product is invalid
+                Product ProductNameIsMissing = new Product()
                 {
                     ProductId=2,
-                    ProductName="TShirts",
-                    Price=23
+                    Price=23,
+                    CategoryId=1
                 };
             
                 //Act
-                bool isValid = Validator.TryValidateObject(CategoryIsMissing, new ValidationContext(CategoryIsMissing), result);
+                bool isValid = Validator.TryValidateObject(ProductNameIsMissing, new ValidationContext(ProductNameIsMissing), result);
                
                 //Assert
                 Assert.False(isValid);
                 Assert.Equal(1, result.Count);//one error 
-                Assert.Equal("Category", result[0].MemberNames.ElementAt(0)); 
-                Assert.Equal("The Category field is required.", result[0].ErrorMessage); 
+                Assert.Equal("ProductName", result[0].MemberNames.ElementAt(0)); 
+                Assert.Equal("The ProductName field is required.", result[0].ErrorMessage); 
             }
         }
 
@@ -145,10 +146,10 @@ namespace MyApp.UnitTests
         [Fact]
         public async Task Post_ValidObject_ReturnsOkResult()
         {
-            using (var Context = new ShoppingCartContext(CreateNewContext()))
+            using (var context = new ShoppingCartContext(CreateNewContext()))
             {
                 //Arrange
-                var _Controller = new ProductController(Context);//pass context inside controller
+                var controller = new ProductController(context, new ProductService(context));//pass context and ProductService inside controller
                 Category CategoryTestData = new Category()
                 {
                     CategoryId = 1, 
@@ -166,10 +167,10 @@ namespace MyApp.UnitTests
                 };
             
                 //Act
-                var CreatedResponse = await _Controller.Post(P);
+                var createdResponse = await controller.Post(P);
             
                 //Assert
-                Assert.IsType<OkObjectResult>(CreatedResponse);
+                Assert.IsType<OkObjectResult>(createdResponse);
             }
         }
 
@@ -178,16 +179,16 @@ namespace MyApp.UnitTests
         [Fact]
         public async Task Put_NotExistingProductPassed_ReturnsNotFoundResponse()
         {
-            using (var Context = new ShoppingCartContext(CreateNewContext()))
+            using (var context = new ShoppingCartContext(CreateNewContext()))
             {
                 //Arrange
-                var _Controller = new ProductController(Context);//pass context inside controller
+                var controller = new ProductController(context, new ProductService(context));//pass context and ProductService inside controller
             
                 //Act
-                var BadResponse = await _Controller.Put(null);//non existing Product is paased
+                var badResponse = await controller.Put(null);//non existing Product is paased
             
                 //Assert
-                Assert.IsType<NotFoundResult>(BadResponse);
+                Assert.IsType<NotFoundResult>(badResponse);
             }
         }
 
@@ -196,17 +197,17 @@ namespace MyApp.UnitTests
         [Fact]
         public async Task Put_ExistingProductPassed_ReturnsOkResult()
         {
-            using (var Context = new ShoppingCartContext(CreateNewContext()))
+            using (var context = new ShoppingCartContext(CreateNewContext()))
             {
                 //Arrange
-                Product X=Context.ProductTestData();
-                var _Controller = new ProductController(Context);//pass context inside controller
+                Product product = context.ProductTestData();
+                var controller = new ProductController(context, new ProductService(context));//pass context and ProductService inside controller
             
                 //Act
-                var OkResponse = await _Controller.Put(X);//existing Product is passed
+                var okResponse = await controller.Put(product);//existing Product is passed
 
                 //Assert
-                Assert.IsType<OkObjectResult>(OkResponse);
+                Assert.IsType<OkObjectResult>(okResponse);
             }
         }
 
@@ -215,16 +216,16 @@ namespace MyApp.UnitTests
         [Fact]
         public async Task Remove_NullPassed_ReturnsNotFoundResponse()
         {
-            using (var Context = new ShoppingCartContext(CreateNewContext()))
+            using (var context = new ShoppingCartContext(CreateNewContext()))
             {
                 //Arrange
-                var _Controller = new ProductController(Context);//pass context inside controller
+                var controller = new ProductController(context, new ProductService(context));//pass context and ProductService inside controller
             
                 //Act
-                var BadResponse = await _Controller.Delete(null);//When null is passed
+                var badResponse = await controller.Delete(null);//When null is passed
         
                 //Assert
-                Assert.IsType<NotFoundResult>(BadResponse);
+                Assert.IsType<NotFoundResult>(badResponse);
             }
         }
 
@@ -233,16 +234,16 @@ namespace MyApp.UnitTests
         [Fact]
         public async Task Remove_NotExistingIntIdPassed_ReturnsNotFoundResponse()
         {
-            using (var Context = new ShoppingCartContext(CreateNewContext()))
+            using (var context = new ShoppingCartContext(CreateNewContext()))
             {
                 //Arrange
-                var _Controller = new ProductController(Context);//pass context inside controller
+                var controller = new ProductController(context, new ProductService(context));//pass context and ProductService inside controller
             
                 //Act
-                var BadResponse = await _Controller.Delete(10);//When Non existing Id is passed
+                var badResponse = await controller.Delete(10);//When Non existing Id is passed
             
                 //Assert
-                Assert.IsType<NotFoundResult>(BadResponse);
+                Assert.IsType<NotFoundResult>(badResponse);
             }
         }
 
@@ -251,18 +252,18 @@ namespace MyApp.UnitTests
         [Fact]
         public async Task Remove_ExistingIntIdPassed_ReturnsOkResult()
         {
-            using (var Context = new ShoppingCartContext(CreateNewContext()))
+            using (var context = new ShoppingCartContext(CreateNewContext()))
             {
                 //Arrange
-                Context.ProductTestData();//Add dummy data
+                context.ProductTestData();//Add dummy data
             
-                var _Controller = new ProductController(Context);//pass context inside controller
+                var controller = new ProductController(context, new ProductService(context));//pass context and ProductService inside controller
         
                 //Act
-                var OkResponse1 = await _Controller.Delete(1);
+                var okResponse1 = await controller.Delete(1);
         
                 //Assert
-                Assert.IsType<OkResult>(OkResponse1);
+                Assert.IsType<OkResult>(okResponse1);
             }
         }
     }

@@ -11,6 +11,7 @@ using Microsoft.Extensions.Hosting;
 using MyApp.Core.Contexts;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.AspNetCore.Mvc.Razor;
+using MyApp.Core.Services;
 
 namespace MyApp
 {
@@ -28,8 +29,12 @@ namespace MyApp
         public void ConfigureServices(IServiceCollection services)
         {
             services.AddControllersWithViews();
+            services.AddScoped<ICategoryService, CategoryService>();
+            services.AddScoped<IProductService, ProductService>();
+            services.AddScoped<ICartItemService, CartItemService>();
+            services.AddScoped<ICartService, CartService>();
             
-            // Register DbContext 
+            //Register DbContext 
             services.AddDbContext<ShoppingCartContext>(options =>options.UseSqlite(Configuration.GetConnectionString("ShoppingCartContext")));
         }
 

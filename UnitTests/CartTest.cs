@@ -10,6 +10,7 @@ using System;
 using System.Threading.Tasks;
 using Microsoft.Extensions.DependencyInjection;
 using System.ComponentModel.DataAnnotations;
+using MyApp.Core.Services;
 
 //The app should fail gracefully
 //Consider all possible aspects that user : test cases with all possible input and output
@@ -39,19 +40,17 @@ namespace MyApp.UnitTests{
         [Fact]
         public void GetCart_WhenCalled_ReturnsAllCartItems_And_GrandTotal()
         {
-            using (var Context = new ShoppingCartContext(CreateNewContext()))
+            using (var context = new ShoppingCartContext(CreateNewContext()))
             {
                 //Arrange
-                Context.CartTestData();//We make sure that dummy data has been added
-                var Controller = new CartController(Context);//pass context inside controller
+                context.CartTestData();//We make sure that dummy data has been added
+                var controller = new CartController(context, new CartService(context));//pass context inside controller
 
                 //Act
-                var Results = Controller.GetCart();//call Get() function inside Cart controller
-                var OkResult = Controller.GetCart();
-
+                var results = controller.GetCart();//call Get() function inside Cart controller
+           
                 //Assert
-                Assert.NotNull(Results);//make sure that Get Method returns value 
-                Assert.IsType<OkObjectResult>(OkResult.Result);
+                Assert.NotNull(results);//make sure that Get Method returns value 
             } 
         } 
     }

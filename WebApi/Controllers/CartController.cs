@@ -5,6 +5,8 @@ using MyApp.Core.Models;
 using MyApp.Core.Contexts;
 using System.Threading.Tasks;//Task
 using Microsoft.EntityFrameworkCore;//Include()
+//using static MyApp.Core.Services.CartService;
+using MyApp.Core.Services;
 
 namespace MyApp.WebApi.Controllers
 {
@@ -13,30 +15,21 @@ namespace MyApp.WebApi.Controllers
    [ApiController]//This is Api Controller
     public class CartController: Controller
     {
-        private ShoppingCartContext x;//Create object of ShoppingCartContext
+        private ICartService _service;
+        private ShoppingCartContext _context;//Create object of ShoppingCartContext
         
         //Constructor and dependency injection (constructor injection)
-        public CartController(ShoppingCartContext y)
+        public CartController(ShoppingCartContext context, ICartService service)
         {
-            x=y;
+            _context = context;
+            _service = service;
         }
         
         //Get list of all the Products inside cart
        [HttpGet]
-        public ActionResult<IEnumerable<Cart>>GetCart()
+        public Cart GetCart()
         {
-           //show the list of cart items (each cart item is a Product and each Product has a Category)
-            var Cart_Items =x.CartItems.Include(i=>i.Product).ToList();
-            var MyProduct =x.Products.Include(i=>i.Category).ToList();
-
-            Cart MyCart = new Cart//create object 
-            {
-                //MyCart contains list of cart items and Grand Total
-                AllCartItems = Cart_Items,
-                GrandTotal = Cart_Items.Sum(x => x.Price * x.Quantity)//calculate Grandtotal  
-            };
-            
-            return Ok(MyCart);
+            return _service.GetCart();
         }     
     }
 }

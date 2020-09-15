@@ -11,6 +11,7 @@ using System.Threading.Tasks;
 using System.Data.Common;
 using Microsoft.Extensions.DependencyInjection;
 using System.ComponentModel.DataAnnotations;
+using MyApp.Core.Services;
 
 //The app should fail gracefully
 //Consider all possible aspects that user : test cases with all possible input and output
@@ -41,17 +42,17 @@ namespace MyApp.UnitTests
         [Fact]
         public void Get_WhenCalled_ReturnsAllCategories()
         {
-            using (var Context = new ShoppingCartContext(CreateNewContext()))
+            using (var context = new ShoppingCartContext(CreateNewContext()))
             {
                 //Arrange
-                Context.CategoryTestData();//We make sure that dummy data has been added
-                var Controller = new CategoryController(Context);//pass context inside controller
+                context.CategoryTestData();//We make sure that dummy data has been added
+                var controller = new CategoryController(context, new CategoryService(context) );//pass context and CategoryService inside controller
 
                 //Act
-                var Results = Controller.Get();//call Get() function inside Category controller
+                var results = controller.Get();//call Get() function inside Category controller
 
                 //Assert
-                Assert.NotNull(Results);//make sure that Get Method returns value
+                Assert.NotNull(results);//make sure that Get Method returns value
             }
         }
 
@@ -60,14 +61,14 @@ namespace MyApp.UnitTests
         [Fact]
         public void GetById_ExistingIntIdPassed_ReturnsOkResult()
         {
-            using (var Context = new ShoppingCartContext(CreateNewContext()))
+            using (var context = new ShoppingCartContext(CreateNewContext()))
             {
                 //Arrange
-                Context.CategoryTestData();
-                var Controller = new CategoryController(Context);//pass Context inside controller
+                context.CategoryTestData();
+                var controller = new CategoryController(context, new CategoryService(context));//pass context and CategoryService inside controller
             
                 //Act
-                var OkResult = Controller.GetById(1);//1 is valid Id 
+                var OkResult = controller.GetById(1);//1 is valid Id 
             
                 //Assert
                 Assert.IsType<OkObjectResult>(OkResult.Result);//When Id is valid the result is type of OkObjectResult
@@ -79,16 +80,16 @@ namespace MyApp.UnitTests
         [Fact]
         public void GetById_InvalidIdPassed_ReturnsNotFoundResult()//check if invalid Id is passed
         {
-            using (var Context = new ShoppingCartContext(CreateNewContext()))
+            using (var context = new ShoppingCartContext(CreateNewContext()))
             {
                 //Arrange
-                var Controller = new CategoryController(Context);//pass context inside controller
+                     var controller = new CategoryController(context, new CategoryService(context));//pass context and CategoryService inside controller
 
                 //Act
-                var Not_Found_Result = Controller.GetById(-1);//-1 is Invalid Id
+                var not_Found_Result = controller.GetById(-1);//-1 is Invalid Id
 
                 //Assert
-                Assert.IsType<NotFoundResult>(Not_Found_Result.Result);
+                Assert.IsType<NotFoundResult>(not_Found_Result.Result);
         
             }
         }
@@ -98,17 +99,17 @@ namespace MyApp.UnitTests
         [Fact]
         public void GetById_ExistingIntIdPassed_ReturnsRightItem()
         {
-            using (var Context = new ShoppingCartContext(CreateNewContext()))
+            using (var context = new ShoppingCartContext(CreateNewContext()))
             {
                 //Arrange
-                Context.CategoryTestData();
-                var Controller = new CategoryController(Context);//pass context inside controller
+                context.CategoryTestData();
+                var controller = new CategoryController(context, new CategoryService(context));//pass context and CategoryService inside controller
             
                 //Act
-                var OkResult = Controller.GetById(1).Result as OkObjectResult;
+                var okResult = controller.GetById(1).Result as OkObjectResult;
             
                 //Assert
-                Assert.Equal("Clothes", (OkResult.Value as Category).CategoryName);
+                Assert.Equal("Clothes", (okResult.Value as Category).CategoryName);
             }
         }
 
@@ -145,10 +146,10 @@ namespace MyApp.UnitTests
         [Fact]
         public async Task Post_ValidObject_ReturnsOkResult()
         {
-            using (var Context = new ShoppingCartContext(CreateNewContext()))
+            using (var context = new ShoppingCartContext(CreateNewContext()))
             {
                 //Arrange
-                var _Controller = new CategoryController(Context);//pass context inside controller
+                var controller = new CategoryController(context, new CategoryService(context));//pass context and CategoryService inside controller
                 Category TestData = new Category()
                 {
                     CategoryId = 2, 
@@ -156,10 +157,10 @@ namespace MyApp.UnitTests
                 };
             
                 //Act
-                var CreatedResponse = await _Controller.Post(TestData);
+                var createdResponse = await controller.Post(TestData);
             
                 //Assert
-                Assert.IsType<OkObjectResult>(CreatedResponse);
+                Assert.IsType<OkObjectResult>(createdResponse);
             }
         }
 
@@ -168,16 +169,16 @@ namespace MyApp.UnitTests
         [Fact]
         public async Task Put_NotExistingCategoryPassed_ReturnsNotFoundResponse()
         {
-            using (var Context = new ShoppingCartContext(CreateNewContext()))
+            using (var context = new ShoppingCartContext(CreateNewContext()))
             {
                 //Arrange
-                var _Controller = new CategoryController(Context);//pass context inside controller
+                     var controller = new CategoryController(context, new CategoryService(context));//pass context and CategoryService inside controller
             
                 //Act
-                var BadResponse = await _Controller.Put(null);//non existing Category is paased
+                var badResponse = await controller.Put(null);//non existing Category is paased
             
                 //Assert
-                Assert.IsType<NotFoundResult>(BadResponse);
+                Assert.IsType<NotFoundResult>(badResponse);
             }
         }
 
@@ -186,17 +187,17 @@ namespace MyApp.UnitTests
         [Fact]
         public async Task Put_ExistingCategoryPassed_ReturnsOkResult()
         {
-            using (var Context = new ShoppingCartContext(CreateNewContext()))
+            using (var context = new ShoppingCartContext(CreateNewContext()))
             {
                 //Arrange
-                var _Controller = new CategoryController(Context);//pass context inside controller
-                Category  C =Context.CategoryTestData();
+                     var controller = new CategoryController(context, new CategoryService(context) );//pass context and CategoryService inside controller
+                Category  C =context.CategoryTestData();
             
                 //Act
-                var OkResponse = await _Controller.Put(C);//existing Category is passed
+                var okResponse = await controller.Put(C);//existing Category is passed
             
                 //Assert
-                Assert.IsType<OkObjectResult>(OkResponse);
+                Assert.IsType<OkObjectResult>(okResponse);
             }
         }
         
@@ -205,16 +206,16 @@ namespace MyApp.UnitTests
         [Fact]
         public async Task Remove_NullPassed_ReturnsNotFoundResponse()
         {
-            using (var Context = new ShoppingCartContext(CreateNewContext()))
+            using (var context = new ShoppingCartContext(CreateNewContext()))
             {
                 //Arrange
-                var _Controller = new CategoryController(Context);//pass context inside controller
+                var controller = new CategoryController(context, new CategoryService(context) );//pass context and CategoryService inside controller
             
                 //Act
-                var BadResponse = await _Controller.Delete(null);
+                var badResponse = await controller.Delete(null);
 
                 //Assert
-                Assert.IsType<NotFoundResult>(BadResponse);
+                Assert.IsType<NotFoundResult>(badResponse);
             }
         }
 
@@ -223,16 +224,16 @@ namespace MyApp.UnitTests
         [Fact]
         public async Task Remove_NotExistingIntIdPassed_ReturnsNotFoundResponse()
         {
-            using (var Context = new ShoppingCartContext(CreateNewContext()))
+            using (var context = new ShoppingCartContext(CreateNewContext()))
             {
                 //Arrange
-                var _Controller = new CategoryController(Context);//pass context inside controller
+                var controller = new CategoryController(context, new CategoryService(context) );//pass context and CategoryService inside controller
             
                 //Act
-                var BadResponse = await _Controller.Delete(11);
+                var badResponse = await controller.Delete(11);
             
                 //Assert
-                Assert.IsType<NotFoundResult>(BadResponse);
+                Assert.IsType<NotFoundResult>(badResponse);
             }
         }
 
@@ -241,17 +242,17 @@ namespace MyApp.UnitTests
         [Fact]
         public async Task Remove_ExistingIntIdPassed_ReturnsOkResult()
         {
-            using (var Context = new ShoppingCartContext(CreateNewContext()))
+            using (var context = new ShoppingCartContext(CreateNewContext()))
             {
                 //Arrange
-                Context.CategoryTestData();
-                var _Controller = new CategoryController(Context);//pass context inside controller
+                context.CategoryTestData();
+                var controller = new CategoryController(context, new CategoryService(context) );//pass context and CategoryService inside controller
                 
                 //Act
-                var OkResponse2 = await _Controller.Delete(1);
+                var okResponse = await controller.Delete(1);
 
                 //Assert
-                Assert.IsType<OkResult>(OkResponse2);
+                Assert.IsType<OkResult>(okResponse);
             }          
         }
     }

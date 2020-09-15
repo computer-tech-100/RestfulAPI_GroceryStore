@@ -8,6 +8,7 @@ namespace MyApp.Core.Models
     {
         //Product properties which are columns in the table
         public int ProductId {get; set;} //ProductId is primary key
+        [Required]
         public string ProductName {get; set;}
         public decimal Price{get; set;} =0;
         //Use foreign key to link data between categories table and products table
@@ -15,7 +16,6 @@ namespace MyApp.Core.Models
         public int CategoryId {get; set;} //Foreign key
         
         [ForeignKey("CategoryId")]//CategoryId is Foreign Key 
-        [Required]
         public Category Category {get; set;}
     }
 }
