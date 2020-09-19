@@ -14,28 +14,28 @@ namespace MyApp.Core.Services
         private ShoppingCartContext _context;//Create object of ShoppingCartContext
         public CartService(ShoppingCartContext context)
         {
-            _context=context;
+            _context = context;
         }
         
-        public Cart GetCart()
+        public Cart GetMyCart()
         {
            //show the list of cart items (each cart item is a Product and each Product has a Category)
-            var Cart_Items =_context.CartItems.Include(i=>i.Product).ToList();
-            var MyProduct =_context.Products.Include(i=>i.Category).ToList();
+            List <CartItem> cart_Items = _context.CartItems.Include(i => i.Product).ToList();
+            List <Product> myProduct = _context.Products.Include(i => i.Category).ToList();
 
-            Cart MyCart = new Cart//create object 
+            Cart myCart = new Cart//create object 
             {
                 //MyCart contains list of cart items and Grand Total
-                AllCartItems = Cart_Items,
-                GrandTotal = Cart_Items.Sum(x => x.Price * x.Quantity)//calculate Grandtotal  
+                AllCartItems = cart_Items,
+                GrandTotal = cart_Items.Sum(x => x.Price * x.Quantity)//calculate Grandtotal  
             };
 
-            return MyCart;
+            return myCart;
         }
     }
     
     public interface ICartService
     {
-        Cart GetCart();
+        Cart GetMyCart();
     }   
 }

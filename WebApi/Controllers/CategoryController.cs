@@ -19,8 +19,8 @@ namespace MyApp.WebApi.Controllers
         //Constructor and dependency injection (constructor injection) to acess database and tables
         public CategoryController(ShoppingCartContext context, ICategoryService service)
         {
-            _context=context;
-            _service=service;
+            _context = context;
+            _service = service;
         }
 
         //Get list of all the categories
@@ -39,7 +39,7 @@ namespace MyApp.WebApi.Controllers
         public ActionResult <Category> GetById(int id)
         {
             //Negative Id is invalid
-            if(id<=0)
+            if(id <= 0)
             {
                 return NotFound();
             }
@@ -48,7 +48,7 @@ namespace MyApp.WebApi.Controllers
             //Check to see if the user's id exists in database
             //If it exists then FirstOrDefault will get the first category that matches to the user's id and stores it in GetCategoryById 
             //Otherwise GetCategoryId will be null
-            if(_service.GetCategory(id)==null)
+            if(_service.GetCategory(id) == null)
             {
                 return NotFound();
             }
@@ -65,7 +65,7 @@ namespace MyApp.WebApi.Controllers
         //If user entered valid data then we have to check if ModelState is valid or not
         //If ModelState is valid then we add Category to database
         [HttpPost]
-        public async Task<ActionResult> Post (Category c)
+        public async Task<ActionResult> Post(Category c)
         {
             //When user enters invalid data
             if (c == null)
@@ -91,10 +91,10 @@ namespace MyApp.WebApi.Controllers
         //If ModelState is valid then we have to check if Category exists in database
         //If Category exists then we update it, and save the changes
         [HttpPut("{id}")]
-        public async Task<ActionResult> Put (Category category)
+        public async Task<ActionResult> Put(Category category)
         {
             //when user enteres an ivalid data then we return NotFound
-            if( category ==null )
+            if( category == null )
             {
                 return NotFound();
             }
@@ -104,7 +104,7 @@ namespace MyApp.WebApi.Controllers
                 return BadRequest(ModelState); 
             }
           
-            if(_service.UpdateCategory(category)==null)
+            if(_service.UpdateCategory(category) == null)
             {
                 return NotFound();
             }
@@ -116,16 +116,16 @@ namespace MyApp.WebApi.Controllers
         //When we want to delete a category first we have to check if entered id is valid or not
         //If valid then check if category exits or not if exists then delete it
         [HttpDelete("{id}")]
-        public async Task<ActionResult> Delete (int? id)
+        public async Task<ActionResult> Delete(int? id)
         {
             //Invalid input
-            if(id==null)
+            if(id == null)
             {
                 return NotFound();
             }
            
-            Category category =_context.Categories.FirstOrDefault(n=>n.CategoryId==id);
-            if(category==null)
+            Category category = _context.Categories.FirstOrDefault(n => n .CategoryId == id);
+            if(category == null)
             {
                 return NotFound();
             }

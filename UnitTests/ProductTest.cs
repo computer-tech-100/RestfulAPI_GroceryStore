@@ -11,6 +11,7 @@ using System.Threading.Tasks;
 using Microsoft.Extensions.DependencyInjection;
 using System.ComponentModel.DataAnnotations;
 using MyApp.Core.Services;
+using Moq;
 
 //The app should fail gracefully
 //Consider all possible aspects that user : test cases with all possible input and output
@@ -27,29 +28,31 @@ namespace MyApp.UnitTests
         private static DbContextOptions<ShoppingCartContext> CreateNewContext()
         {
             //Create a new service provider and new InMemory database 
-            var MyServiceProvider = new ServiceCollection()
+            ServiceProvider myServiceProvider = new ServiceCollection()
             .AddEntityFrameworkInMemoryDatabase()
             .BuildServiceProvider();
 
             //Context uses InMemory database and the new service provider 
-            var My_Builder = new DbContextOptionsBuilder<ShoppingCartContext>();
-            My_Builder.UseInMemoryDatabase("Data Source=MyShoppingCart.db")
-            .UseInternalServiceProvider(MyServiceProvider);
-            return My_Builder.Options;
+            DbContextOptionsBuilder <ShoppingCartContext> my_Builder = new DbContextOptionsBuilder<ShoppingCartContext>();
+            my_Builder.UseInMemoryDatabase("Data Source=MyShoppingCart.db")
+            .UseInternalServiceProvider(myServiceProvider);
+            return my_Builder.Options;
         }
 
         //Test Get() Method
         [Fact]
         public void Get_WhenCalled_ReturnsAllProducts()
         {
-            using (var context = new ShoppingCartContext(CreateNewContext()))
+            using (ShoppingCartContext context = new ShoppingCartContext(CreateNewContext()))
             {
                 //Arrange
+                Mock <IProductService> moqRepo = new Mock <IProductService>();//Mock is type of our Interface
                 context.ProductTestData();//We make sure that dummy data has been added
-                var controller = new ProductController(context, new ProductService(context));//pass context and ProductService inside controller
+                moqRepo.Setup(repo => repo.GetProducts()).Returns(context.Products);//access the function inside the service class and specify what it returns
+                ProductController controller = new ProductController(context, moqRepo.Object);//pass context and moq object inside controller
 
                 //Act
-                var results = controller.Get();//call Get() function inside Procuct controller
+                ActionResult <IEnumerable<Product>> results = controller.Get();//call Get() function inside Procuct controller
 
                 //Assert
                 Assert.NotNull(results);//make sure that Get Method returns value 
@@ -61,14 +64,16 @@ namespace MyApp.UnitTests
         [Fact]
         public void GetById_ExistingIntIdPassed_ReturnsOkResult()
         {
-            using (var context = new ShoppingCartContext(CreateNewContext()))
+            using (ShoppingCartContext context = new ShoppingCartContext(CreateNewContext()))
             {
                 //Arrange
-                context.ProductTestData();//add dummy data
-                var controller = new ProductController(context, new ProductService(context));//pass context and ProductService inside controller
-            
+                Mock <IProductService> moqRepo = new Mock <IProductService>();//Mock is type of our Interface
+                context.ProductTestData();//We make sure that dummy data has been added
+                moqRepo.Setup(repo => repo.GetProduct(1)).Returns(context.Products.FirstOrDefault(i => i.ProductId == 1));//access the function inside the service class and specify what it returns
+                ProductController controller = new ProductController(context, moqRepo.Object);//pass context and moq object inside controller
+              
                 //Act
-                var okResult = controller.GetById(1);//1 is valid Id 
+                ActionResult <Product> okResult = controller.GetById(1);//1 is valid Id 
             
                 //Assert
                 Assert.IsType<OkObjectResult>(okResult.Result);//When Id is valid the result is type of OkObjectResult
@@ -80,13 +85,16 @@ namespace MyApp.UnitTests
         [Fact]
         public void GetById_InvalidIdPassed_ReturnsNotFoundResult() 
         {
-            using (var context = new ShoppingCartContext(CreateNewContext()))
+            using (ShoppingCartContext context = new ShoppingCartContext(CreateNewContext()))
             {
                 //Arrange
-                var controller = new ProductController(context, new ProductService(context));//pass context and ProductService inside controller
+                Mock <IProductService> moqRepo = new Mock <IProductService>();//Mock is type of our Interface
+                context.ProductTestData();//We make sure that dummy data has been added
+                moqRepo.Setup(repo => repo.GetProduct(-1)).Returns(context.Products.FirstOrDefault(i => i.ProductId == -1));//access the function inside the service class and specify what it returns
+                ProductController controller = new ProductController(context, moqRepo.Object);//pass context and moq object inside controller
 
                 //Act
-                var not_Found_Result = controller.GetById(-1);// -1 is Invalid Id
+                ActionResult <Product> not_Found_Result = controller.GetById(-1);// -1 is Invalid Id
 
                 //Assert
                 Assert.IsType<NotFoundResult>(not_Found_Result.Result);
@@ -98,14 +106,16 @@ namespace MyApp.UnitTests
         [Fact]
         public void GetById_ExistingIntIdPassed_ReturnsRightItem()
         {
-            using (var context = new ShoppingCartContext(CreateNewContext()))
+            using (ShoppingCartContext context = new ShoppingCartContext(CreateNewContext()))
             {
                 //Arrange
-                context.ProductTestData();//Add dummy data
-                var controller = new ProductController(context, new ProductService(context));//pass context and ProductService inside controller
+                Mock <IProductService> moqRepo = new Mock <IProductService> ();//Mock is type of our Interface
+                context.ProductTestData();//We make sure that dummy data has been added
+                moqRepo.Setup(repo => repo.GetProduct(1)).Returns(context.Products.FirstOrDefault(i => i.ProductId == 1));//access the function inside the service class and specify what it returns
+                ProductController controller = new ProductController(context, moqRepo.Object);//pass context and moq object inside controller
 
                 //Act
-                var okResult = controller.GetById(1).Result as OkObjectResult;
+                OkObjectResult okResult = controller.GetById(1).Result as OkObjectResult;
             
                 //Assert
                 Assert.Equal("Oranges", (okResult.Value as Product).ProductName);  
@@ -115,29 +125,31 @@ namespace MyApp.UnitTests
         //Test Post() Method 
         //When Invalid object is passed 
         [Fact]
-        public void ProductModelValidation_ProductNameRequired()
+        public async Task ProductModelValidation_ProductNameRequired()
         {
-            using (var Context = new ShoppingCartContext(CreateNewContext()))
+            using (ShoppingCartContext context = new ShoppingCartContext(CreateNewContext()))
             {
                 //Arrange
-                List<ValidationResult> result = new List<ValidationResult>(); 
+                Mock <IProductService> moqRepo = new Mock <IProductService>();//Mock is type of our Interface
 
                 //This Product does not contain ProductName hence the Product is invalid
-                Product ProductNameIsMissing = new Product()
+                Product productNameIsMissing = new Product()
                 {
-                    ProductId=2,
-                    Price=23,
-                    CategoryId=1
+                    ProductId = 2,
+                    Price = 23,
+                    CategoryId = 1
                 };
-            
+
+                moqRepo.Setup(Repo => Repo.CreateProduct(productNameIsMissing));
+                ProductController controller = new ProductController(context, moqRepo.Object);//pass context and moq object inside controller
+                controller.ModelState.AddModelError("ProductName","Required");
+
                 //Act
-                bool isValid = Validator.TryValidateObject(ProductNameIsMissing, new ValidationContext(ProductNameIsMissing), result);
-               
+                ActionResult result = await controller.Post(productNameIsMissing);
+
                 //Assert
-                Assert.False(isValid);
-                Assert.Equal(1, result.Count);//one error 
-                Assert.Equal("ProductName", result[0].MemberNames.ElementAt(0)); 
-                Assert.Equal("The ProductName field is required.", result[0].ErrorMessage); 
+                BadRequestObjectResult badRequestResult = Assert.IsType<BadRequestObjectResult>(result);
+                Assert.IsType<SerializableError>(badRequestResult.Value);
             }
         }
 
@@ -146,28 +158,31 @@ namespace MyApp.UnitTests
         [Fact]
         public async Task Post_ValidObject_ReturnsOkResult()
         {
-            using (var context = new ShoppingCartContext(CreateNewContext()))
+            using (ShoppingCartContext context = new ShoppingCartContext(CreateNewContext()))
             {
                 //Arrange
-                var controller = new ProductController(context, new ProductService(context));//pass context and ProductService inside controller
-                Category CategoryTestData = new Category()
+                Mock <IProductService> moqRepo = new Mock <IProductService>();//Mock is type of our Interface
+
+                 Category categoryTestData = new Category()
                 {
                     CategoryId = 1, 
-                    CategoryName= "Clothes"
+                    CategoryName = "Clothes"
                 
                 };
-                Product P = new Product()
+                Product product = new Product()
                 {
-                    
                     ProductId = 2,
-                    ProductName="TShirts",
-                    Price=23,
-                    CategoryId=1,
-                    Category=CategoryTestData
+                    ProductName = "TShirts",
+                    Price = 23,
+                    CategoryId = 1,
+                    Category = categoryTestData
                 };
+
+                moqRepo.Setup(repo => repo.CreateProduct(product));//access the function inside the service class and specify what it returns
+                ProductController controller = new ProductController(context, moqRepo.Object);//pass context and moq object inside controller
             
                 //Act
-                var createdResponse = await controller.Post(P);
+                ActionResult createdResponse = await controller.Post(product);
             
                 //Assert
                 Assert.IsType<OkObjectResult>(createdResponse);
@@ -179,13 +194,15 @@ namespace MyApp.UnitTests
         [Fact]
         public async Task Put_NotExistingProductPassed_ReturnsNotFoundResponse()
         {
-            using (var context = new ShoppingCartContext(CreateNewContext()))
+            using (ShoppingCartContext context = new ShoppingCartContext(CreateNewContext()))
             {
                 //Arrange
-                var controller = new ProductController(context, new ProductService(context));//pass context and ProductService inside controller
+                Mock <IProductService> moqRepo = new Mock <IProductService>();//Mock is type of our Interface
+                moqRepo.Setup(repo => repo.UpdateProduct(null));//access the function inside the service class and specify what it returns
+                ProductController controller = new ProductController(context, moqRepo.Object);//pass context and moq object inside controller
             
                 //Act
-                var badResponse = await controller.Put(null);//non existing Product is paased
+                ActionResult badResponse = await controller.Put(null);//non existing Product is paased
             
                 //Assert
                 Assert.IsType<NotFoundResult>(badResponse);
@@ -197,14 +214,16 @@ namespace MyApp.UnitTests
         [Fact]
         public async Task Put_ExistingProductPassed_ReturnsOkResult()
         {
-            using (var context = new ShoppingCartContext(CreateNewContext()))
+            using (ShoppingCartContext context = new ShoppingCartContext(CreateNewContext()))
             {
                 //Arrange
+                Mock <IProductService> moqRepo = new Mock <IProductService>();//Mock is type of our Interface
                 Product product = context.ProductTestData();
-                var controller = new ProductController(context, new ProductService(context));//pass context and ProductService inside controller
-            
+                moqRepo.Setup(repo => repo.UpdateProduct(product));//access the function inside the service class and specify what it returns
+                ProductController controller = new ProductController(context, moqRepo.Object);//pass context and moq object inside controller
+               
                 //Act
-                var okResponse = await controller.Put(product);//existing Product is passed
+                ActionResult okResponse = await controller.Put(product);//existing Product is passed
 
                 //Assert
                 Assert.IsType<OkObjectResult>(okResponse);
@@ -216,13 +235,15 @@ namespace MyApp.UnitTests
         [Fact]
         public async Task Remove_NullPassed_ReturnsNotFoundResponse()
         {
-            using (var context = new ShoppingCartContext(CreateNewContext()))
+            using (ShoppingCartContext context = new ShoppingCartContext(CreateNewContext()))
             {
                 //Arrange
-                var controller = new ProductController(context, new ProductService(context));//pass context and ProductService inside controller
-            
+                Mock <IProductService> moqRepo = new Mock <IProductService>();//Mock is type of our Interface
+                moqRepo.Setup(repo => repo.DeleteProduct(null));//access the function inside the service class and specify what it returns
+                ProductController controller = new ProductController(context, moqRepo.Object);//pass context and moq object inside controller
+        
                 //Act
-                var badResponse = await controller.Delete(null);//When null is passed
+                ActionResult badResponse = await controller.Delete(null);//When null is passed
         
                 //Assert
                 Assert.IsType<NotFoundResult>(badResponse);
@@ -234,13 +255,16 @@ namespace MyApp.UnitTests
         [Fact]
         public async Task Remove_NotExistingIntIdPassed_ReturnsNotFoundResponse()
         {
-            using (var context = new ShoppingCartContext(CreateNewContext()))
+            using (ShoppingCartContext context = new ShoppingCartContext(CreateNewContext()))
             {
                 //Arrange
-                var controller = new ProductController(context, new ProductService(context));//pass context and ProductService inside controller
+                Mock <IProductService> moqRepo = new Mock <IProductService>();//Mock is type of our Interface
+                context.ProductTestData();//We make sure that dummy data has been added
+                moqRepo.Setup(repo => repo.DeleteProduct(10));//access the function inside the service class and specify what it returns
+                ProductController controller = new ProductController(context, moqRepo.Object);//pass context and moq object inside controller
             
                 //Act
-                var badResponse = await controller.Delete(10);//When Non existing Id is passed
+                ActionResult badResponse = await controller.Delete(10);//When Non existing Id is passed
             
                 //Assert
                 Assert.IsType<NotFoundResult>(badResponse);
@@ -252,18 +276,19 @@ namespace MyApp.UnitTests
         [Fact]
         public async Task Remove_ExistingIntIdPassed_ReturnsOkResult()
         {
-            using (var context = new ShoppingCartContext(CreateNewContext()))
+            using (ShoppingCartContext context = new ShoppingCartContext(CreateNewContext()))
             {
                 //Arrange
-                context.ProductTestData();//Add dummy data
-            
-                var controller = new ProductController(context, new ProductService(context));//pass context and ProductService inside controller
+                Mock <IProductService> moqRepo = new Mock <IProductService>();//Mock is type of our Interface
+                context.ProductTestData();//We make sure that dummy data has been added
+                moqRepo.Setup(repo => repo.DeleteProduct(1));//access the function inside the service class and specify what it returns
+                ProductController controller = new ProductController(context, moqRepo.Object);//pass context and moq object inside controller
         
                 //Act
-                var okResponse1 = await controller.Delete(1);
+                ActionResult okResponse = await controller.Delete(1);
         
                 //Assert
-                Assert.IsType<OkResult>(okResponse1);
+                Assert.IsType<OkResult>(okResponse);
             }
         }
     }

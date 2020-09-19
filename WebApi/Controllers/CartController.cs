@@ -29,7 +29,7 @@ namespace MyApp.WebApi.Controllers
        [HttpGet]
         public Cart GetCart()
         {
-            return _service.GetCart();
+            return _service.GetMyCart();
         }     
     }
 }

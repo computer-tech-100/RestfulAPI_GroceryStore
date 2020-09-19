@@ -39,12 +39,12 @@ namespace MyApp.WebApi.Controllers
         public ActionResult<CartItem> GetById(int id)
         {
             //Invalid id is negative id
-            if(id<=0)
+            if(id <= 0)
             {
                 return NotFound();
             }
              
-            if(_service.GetCartItem(id)==null)
+            if(_service.GetCartItem(id) == null)
             {
                 return NotFound();
             }
@@ -59,7 +59,7 @@ namespace MyApp.WebApi.Controllers
         //First check if entered data is valid if valid check the ModelState
         //If ModelState is valid then add cartItem to the Cart
         [HttpPost]
-        public async Task<ActionResult> Add_To_Cart (CartItem cartItem)
+        public async Task<ActionResult> Add_To_Cart(CartItem cartItem)
         {
             if (cartItem == null)
             {
@@ -82,11 +82,11 @@ namespace MyApp.WebApi.Controllers
         //First check if valid data is entered if valid then check if ModelState is valid
         //If ModelState is valid then check if CartItem exists in database if exits then update it, and save the changes
         [HttpPut("{id}")]
-        public async Task<ActionResult> Edit_CartItem (CartItem cartItem)
+        public async Task<ActionResult> Edit_CartItem(CartItem cartItem)
         {
             
             //When entered data is not valid
-            if(cartItem ==null)
+            if(cartItem == null)
             {
                 return NotFound();
             }
@@ -95,14 +95,16 @@ namespace MyApp.WebApi.Controllers
             {
                 return BadRequest(ModelState);//400 status code  
             }
-
-            if (_service.UpdateCartItem(cartItem)==null)
+            
+            CartItem existingCartItem = _context.CartItems.Include(i => i.Product).FirstOrDefault(s => s.ProductId == cartItem.ProductId);
+            
+            if (_service.UpdateCartItem(cartItem) == null)
             {
                 return NotFound();
             }
 
             await _service.UpdateCartItem(cartItem); 
-            return Ok(cartItem);//Return newly updated CartItem
+            return Ok(existingCartItem);//Return newly updated CartItem
                      
         }
         
@@ -113,14 +115,14 @@ namespace MyApp.WebApi.Controllers
         public async Task<ActionResult> Remove_A_CartItem_From_The_Cart( int? id)
         {
             //Invalid data
-            if(id==null)
+            if(id == null)
             {
                 return NotFound();
             }
             
             //Check if cartItem exists
-            CartItem c =_context.CartItems.FirstOrDefault(n=>n.ProductId==id);
-            if(c==null)
+            CartItem c = _context.CartItems.FirstOrDefault(n => n.ProductId == id);
+            if(c == null)
             {
                 return NotFound();
             }

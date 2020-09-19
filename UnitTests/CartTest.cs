@@ -11,6 +11,7 @@ using System.Threading.Tasks;
 using Microsoft.Extensions.DependencyInjection;
 using System.ComponentModel.DataAnnotations;
 using MyApp.Core.Services;
+using Moq;
 
 //The app should fail gracefully
 //Consider all possible aspects that user : test cases with all possible input and output
@@ -25,26 +26,28 @@ namespace MyApp.UnitTests{
         private static DbContextOptions<ShoppingCartContext> CreateNewContext()
         {
             //Create a new service provider and new InMemory database 
-            var MyServiceProvider = new ServiceCollection()
+            ServiceProvider myServiceProvider = new ServiceCollection()
             .AddEntityFrameworkInMemoryDatabase()
             .BuildServiceProvider();
 
             //Context uses InMemory database and the new service provider 
-            var My_Builder = new DbContextOptionsBuilder<ShoppingCartContext>();
-            My_Builder.UseInMemoryDatabase("Data Source=MyShoppingCart.db")
-            .UseInternalServiceProvider(MyServiceProvider);
-            return My_Builder.Options;
+            DbContextOptionsBuilder <ShoppingCartContext> my_Builder = new DbContextOptionsBuilder<ShoppingCartContext>();
+            my_Builder.UseInMemoryDatabase("Data Source=MyShoppingCart.db")
+            .UseInternalServiceProvider(myServiceProvider);
+            return my_Builder.Options;
         }
 
         //Test Get() Method
         [Fact]
         public void GetCart_WhenCalled_ReturnsAllCartItems_And_GrandTotal()
         {
-            using (var context = new ShoppingCartContext(CreateNewContext()))
+            using (ShoppingCartContext context = new ShoppingCartContext(CreateNewContext()))
             {
                 //Arrange
-                context.CartTestData();//We make sure that dummy data has been added
-                var controller = new CartController(context, new CartService(context));//pass context inside controller
+                Mock <ICartService> moqRepo = new Mock <ICartService>();//Mock is type of our Interface
+                Cart cart =context.CartTestData();//We make sure that dummy data has been added
+                moqRepo.Setup(repo => repo.GetMyCart()).Returns(cart);//access the function inside the service class and specify what it returns
+                CartController controller = new CartController(context, moqRepo.Object);//pass context and moq object inside controller
 
                 //Act
                 var results = controller.GetCart();//call Get() function inside Cart controller

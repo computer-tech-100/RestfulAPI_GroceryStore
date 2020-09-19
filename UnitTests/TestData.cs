@@ -7,132 +7,146 @@ namespace MyApp.UnitTests{
     public static class TestData
     {
         //For Category unit testing we add some dummy test data to the database (we add it to Categories table)
-        public  static Category  CategoryTestData(this ShoppingCartContext x)
+        public  static Category  CategoryTestData(this ShoppingCartContext context)
         {
             //Check if database is created, if not - create
-            x.Database.EnsureCreated();
+            context.Database.EnsureCreated();
 
-            var My_Category = new Category()
+            Category my_Category = new Category()
             {
                 CategoryId = 1,
-                CategoryName="Clothes"
+                CategoryName = "Clothes"
             };
-            x.Categories.Add(My_Category); //add data to Categories table   
-            x.SaveChanges();
-            return My_Category;
+
+            context.Categories.Add(my_Category); //add data to Categories table   
+            context.SaveChanges();
+            return my_Category;
         }
 
         //For Product unit testing we add some dummy test data to the database (we add it to Products table)
-        public static Product ProductTestData(this ShoppingCartContext x)
+        public static Product ProductTestData(this ShoppingCartContext context)
         {
             //Check if database is created, if not - create
-            x.Database.EnsureCreated();
-            var The_Category = new Category()
+            context.Database.EnsureCreated();
+            Category the_Category = new Category()
             {
                 CategoryId = 3,
-                CategoryName="Fruits"
+                CategoryName ="Fruits"
             };
-            var My_Product = new Product()
+
+            Product my_Product = new Product()
             {
             
-                ProductId=1,
-                ProductName="Oranges",
+                ProductId = 1,
+                ProductName = "Oranges",
                 Price=2,
-                CategoryId=3,
-                Category=The_Category
+                CategoryId = 3,
+                Category = the_Category
             };
-            x.Products.Add(My_Product); //add data to Products table   
-            x.SaveChanges();
-            return My_Product;
+
+            context.Products.Add(my_Product); //add data to Products table   
+            context.SaveChanges();
+            return my_Product;
         }
     
         //For CartItem unit testing we add some dummy test data to the database (we add it to CartItems table)
-        public static CartItem CartItemTestData(this ShoppingCartContext x)
+        public static CartItem CartItemTestData(this ShoppingCartContext context)
         {
             //Check if database is created, if not - create
-            x.Database.EnsureCreated();
-            var The_Category = new Category()
+            context.Database.EnsureCreated();
+            Category the_Category = new Category()
             {
                 CategoryId = 3,
-                CategoryName="Fruits"
+                CategoryName = "Fruits"
             };
-            var My_Product = new Product()
+
+            Product my_Product = new Product()
             {
                 ProductId = 1,
-                ProductName="Oranges",
-                Price=2,
-                CategoryId=3,
-                Category=The_Category
+                ProductName = "Oranges",
+                Price = 2,
+                CategoryId = 3,
+                Category = the_Category
             };
-            var My_CartItem = new CartItem()
+
+            CartItem my_CartItem = new CartItem()
             {
                 ProductId = 1,
-                Product=My_Product,
-                Price=2,
-                Quantity=5 
+                Product = my_Product,
+                Price = 2,
+                Quantity = 5 
             };
-            x.CartItems.Add(My_CartItem); //add data to CartItems table   
-            x.SaveChanges();
-            return My_CartItem;
+
+            context.CartItems.Add(my_CartItem); //add data to CartItems table   
+            context.SaveChanges();
+            return my_CartItem;
         }
     
         //For Cart unit testing we add some dummy test data to the database (we add it to Carts table)
-        public static Cart CartTestData(this ShoppingCartContext x)
+        public static Cart CartTestData(this ShoppingCartContext context)
         {
             //Check if database is created, if not - create
-            x.Database.EnsureCreated();
-            var The_Category = new Category()
+            context.Database.EnsureCreated();
+            Category the_Category = new Category()
             {
                 CategoryId = 2,
-                CategoryName="Items"
+                CategoryName = "Items"
             };
-            var The_Category2 = new Category()
+
+            Category the_Category2 = new Category()
             {
                 CategoryId = 3,
-                CategoryName="Fruits"
+                CategoryName = "Fruits"
             };
-            var My_Product1 = new Product()
+
+            Product my_Product1 = new Product()
             {
                 ProductId = 3,
-                ProductName="Chocolate",
-                Price=3,
-                CategoryId=2,
-                Category=The_Category
+                ProductName = "Chocolate",
+                Price = 3,
+                CategoryId = 2,
+                Category = the_Category
             };
-            var My_Product2 = new Product()
+
+            Product my_Product2 = new Product()
             {
                 ProductId = 1,
-                ProductName="Oranges",
-                Price=2,
-                CategoryId=3,
-                Category=The_Category2
+                ProductName = "Oranges",
+                Price = 2,
+                CategoryId = 3,
+                Category = the_Category2
             };
-            var My_CartItem1 = new CartItem()
+
+            CartItem my_CartItem1 = new CartItem()
             {
                 ProductId = 3,
-                Product=My_Product1,
-                Price=3,
-                Quantity=2   
+                Product = my_Product1,
+                Price = 3,
+                Quantity = 2   
             };
-            var My_CartItem2 = new CartItem()
+
+            CartItem my_CartItem2 = new CartItem()
             {
                 ProductId = 1,
-                Product=My_Product2,
-                Price=2,
-                Quantity=5  
+                Product = my_Product2,
+                Price = 2,
+                Quantity = 5  
             };
+
             List<CartItem> All_Cart_Items = new List<CartItem>();
-            All_Cart_Items.Add(My_CartItem1);
-            All_Cart_Items.Add(My_CartItem2);
-            var My_Cart = new Cart(){
-                CartId=1,
-                CartName="My Cart",
-                AllCartItems=All_Cart_Items,
-                GrandTotal=16 // --> (3*2)+(2*5)
+            All_Cart_Items.Add(my_CartItem1);
+            All_Cart_Items.Add(my_CartItem2);
+
+            Cart my_Cart = new Cart(){
+                CartId = 1,
+                CartName = "My Cart",
+                AllCartItems = All_Cart_Items,
+                GrandTotal = 16 // --> (3*2)+(2*5)
             };
-            x.Carts.Add(My_Cart);//add data to Carts table   
-            x.SaveChanges();
-            return My_Cart;
+            
+            context.Carts.Add(my_Cart);//add data to Carts table   
+            context.SaveChanges();
+            return my_Cart;
         }
     }
 }
