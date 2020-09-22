@@ -147,8 +147,8 @@ namespace MyApp.UnitTests
                 ActionResult result = await controller.Post(categoryNameIsMissing);
 
                 //Assert
-                BadRequestObjectResult badRequestResult = Assert.IsType<BadRequestObjectResult>(result);
-                Assert.IsType<SerializableError>(badRequestResult.Value);  
+                BadRequestObjectResult badRequest = Assert.IsType<BadRequestObjectResult>(result);
+                Assert.IsType<SerializableError>(badRequest.Value);  
             }
         }
 
