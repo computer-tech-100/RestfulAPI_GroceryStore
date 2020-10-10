@@ -2,7 +2,7 @@ using System;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;//ForeignKey
 
-namespace MyApp.Core.Models
+namespace MyApp.Core.Models.DbEntities
 {
     public class Product
     {

@@ -458,3 +458,4 @@
 /Users/moza/Desktop/MyApp/bin/Debug/netcoreapp3.1/zh-Hant/Microsoft.VisualStudio.TestPlatform.Common.resources.dll
 /Users/moza/Desktop/MyApp/bin/Debug/netcoreapp3.1/Castle.Core.dll
 /Users/moza/Desktop/MyApp/bin/Debug/netcoreapp3.1/Moq.dll
+/Users/moza/Desktop/MyApp/bin/Debug/netcoreapp3.1/AutoMapper.dll

@@ -1,4 +1,4 @@
-using MyApp.Core.Models;
+using MyApp.Core.Models.DbEntities;
 using Microsoft.EntityFrameworkCore;
 using System.Collections.Generic;
 

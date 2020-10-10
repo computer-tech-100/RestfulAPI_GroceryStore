@@ -5,6 +5,8 @@ using MyApp.Core.Models;
 using MyApp.Core.Contexts;
 using System.Threading.Tasks;//Task
 using MyApp.Core.Services;
+using MyApp.Core.Models.DataTransferObjects;
+
 
 namespace MyApp.WebApi.Controllers
 {
@@ -14,20 +16,18 @@ namespace MyApp.WebApi.Controllers
     public class CategoryController: Controller
     {
         private ICategoryService _service;
-        private ShoppingCartContext _context;//Create object of ShoppingCartContext
         
         //Constructor and dependency injection (constructor injection) to acess database and tables
-        public CategoryController(ShoppingCartContext context, ICategoryService service)
+        public CategoryController(ICategoryService service)
         {
-            _context = context;
             _service = service;
         }
 
         //Get list of all the categories
         [HttpGet]
-        public ActionResult <IEnumerable<Category>> Get()
+        public async Task<ActionResult<List<CategoryDTO>>> Get()
         {
-            return _service.GetCategories();
+            return await _service.GetCategories();
         }
 
         //GET/id
@@ -36,7 +36,7 @@ namespace MyApp.WebApi.Controllers
         //If id is positive then we check to see if the category that mathches to the user's id exists in database or not 
         //If it exists then return that category otherwise NotFound()
         [HttpGet("{id}")]
-        public ActionResult <Category> GetById(int id)
+        public ActionResult <CategoryDTO> GetById(int id)
         {
             //Negative Id is invalid
             if(id <= 0)
@@ -65,10 +65,10 @@ namespace MyApp.WebApi.Controllers
         //If user entered valid data then we have to check if ModelState is valid or not
         //If ModelState is valid then we add Category to database
         [HttpPost]
-        public async Task<ActionResult> Post(Category c)
+        public async Task<ActionResult> Post(CategoryDTO category)
         {
             //When user enters invalid data
-            if (c == null)
+            if (category == null)
             {
                 return NotFound();
             }
@@ -80,8 +80,8 @@ namespace MyApp.WebApi.Controllers
                 return BadRequest(ModelState);//400 status code  
             }
 
-            await _service.CreateCategory(c);
-            return Ok(c);//Finally return the newly added category for user to see it
+            await _service.CreateCategory(category);
+            return Ok(category);//Finally return the newly added category for user to see it
         }
 
         //Put/api/category/id
@@ -91,7 +91,7 @@ namespace MyApp.WebApi.Controllers
         //If ModelState is valid then we have to check if Category exists in database
         //If Category exists then we update it, and save the changes
         [HttpPut("{id}")]
-        public async Task<ActionResult> Put(Category category)
+        public async Task<ActionResult> Put(CategoryDTO category)
         {
             //when user enteres an ivalid data then we return NotFound
             if( category == null )
@@ -124,12 +124,6 @@ namespace MyApp.WebApi.Controllers
                 return NotFound();
             }
            
-            Category category = _context.Categories.FirstOrDefault(n => n .CategoryId == id);
-            if(category == null)
-            {
-                return NotFound();
-            }
-
             await _service.DeleteCategory(id);
             return Ok();    
         }

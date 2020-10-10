@@ -5,8 +5,8 @@ using MyApp.Core.Models;
 using MyApp.Core.Contexts;
 using System.Threading.Tasks;//Task
 using Microsoft.EntityFrameworkCore;//Include()
-//using static MyApp.Core.Services.CartService;
 using MyApp.Core.Services;
+using MyApp.Core.Models.DataTransferObjects;
 
 namespace MyApp.WebApi.Controllers
 {
@@ -16,18 +16,16 @@ namespace MyApp.WebApi.Controllers
     public class CartController: Controller
     {
         private ICartService _service;
-        private ShoppingCartContext _context;//Create object of ShoppingCartContext
         
         //Constructor and dependency injection (constructor injection)
-        public CartController(ShoppingCartContext context, ICartService service)
+        public CartController(ICartService service)
         {
-            _context = context;
             _service = service;
         }
         
         //Get list of all the Products inside cart
        [HttpGet]
-        public Cart GetCart()
+        public CartDTO GetCart()
         {
             return _service.GetMyCart();
         }     

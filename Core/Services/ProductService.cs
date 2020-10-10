@@ -5,7 +5,8 @@ using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using MyApp.Core.Contexts;
-using MyApp.Core.Models;
+using MyApp.Core.Models.DataTransferObjects;
+using MyApp.Core.Models.DbEntities;
 
 namespace MyApp.Core.Services
 {
@@ -17,50 +18,87 @@ namespace MyApp.Core.Services
             _context = context;
         }
         
-        public ActionResult<IEnumerable<Product>> GetProducts()
+        public async Task<List<ProductDTO>> GetProducts()
         {
             //Retrieves all products from database and returns list of all of the products including the related category
-            return _context.Products.Include(i => i.Category).ToList();
+            //We translate our model to ProductDTO object using Select
+            return (await _context.Products.Include(i => i.Category).ToListAsync()).Select(c => new ProductDTO
+            {
+                ProductId = c.ProductId,
+                ProductName = c.ProductName,
+                Price = c.Price,
+                CategoryId = c.CategoryId,
+                Category = c.Category
+
+            }).ToList();
         }
 
-        public Product GetProduct(int id)
+        public ProductDTO GetProduct(int id)
         {
-            //If id exists then FirstOrDefault will get the first Product that matches to the user's id and stores it in MyProduct 
-            Product myProduct = _context.Products.Include(i => i.Category).FirstOrDefault(p => p.ProductId == id);
+            //If id exists then FirstOrDefault will get the first Product that matches to the user's id and stores it in MyProduct
+            ProductDTO myProduct = _context.Products.Include(i => i.Category).Select(c => new ProductDTO
+            {
+                ProductId = c.ProductId,
+                ProductName = c.ProductName,
+                Price = c.Price,
+                CategoryId = c.CategoryId,
+                Category = c.Category
+                
+            }).FirstOrDefault(p => p.ProductId == id);
+            
             return myProduct;
         }
 
-        public async Task <Product> CreateProduct(Product product)
+        public async Task <ProductDTO> CreateProduct(ProductDTO product)
         {
-            await _context.Products.AddAsync(product);//Add Product to Products table
+            Product myProduct = new Product()
+            {
+                ProductName = product.ProductName,
+                Price = product.Price,
+                CategoryId = product.CategoryId,
+                Category = product.Category
+            };
+
+            await _context.Products.AddAsync(myProduct);//Add Product to Products table
+
             await _context.SaveChangesAsync();//Save all the changes
+
             _context.Products.Include(i => i.Category).ToList();
+
+            product.ProductId = myProduct.ProductId;
+
             return product;         
         }  
 
-        public async Task<Product> UpdateProduct(Product product)
+        public async Task<ProductDTO> UpdateProduct(ProductDTO product)
         {
-            Product existingProduct = _context.Products.Include(i => i.Category).FirstOrDefault(s => s.ProductId == product.ProductId);
+            var existingProduct = _context.Products.Include(i => i.Category).Single(e => e.ProductId == product.ProductId);
+    
             existingProduct.ProductName = product.ProductName;
+
             existingProduct.Price = product.Price; 
+            
             await _context.SaveChangesAsync();
-            return existingProduct;      
+            
+            return product;
         }
         public async Task DeleteProduct(int? id)
         {
             //Check if Product exists
-            Product c = _context.Products.FirstOrDefault(n => n.ProductId == id);
-            _context.Products.Remove(c);
-            await _context.SaveChangesAsync();  
+            var product = _context.Products.Single(e => e.ProductId == id);
+
+            _context.Products.Remove(product);//Remove product
+
+            await _context.SaveChangesAsync();//Save the changes
         }
     }
 
     public interface IProductService
     {
-        ActionResult <IEnumerable<Product>> GetProducts();
-        Product GetProduct(int id);
-        Task <Product> CreateProduct(Product product);
-        Task<Product> UpdateProduct(Product product);
+        Task<List<ProductDTO>> GetProducts();
+        ProductDTO GetProduct(int id);
+        Task <ProductDTO> CreateProduct(ProductDTO product);
+        Task<ProductDTO> UpdateProduct(ProductDTO product);
         Task DeleteProduct(int? id);
     }
 }

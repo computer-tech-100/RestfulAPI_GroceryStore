@@ -6,6 +6,8 @@ using MyApp.Core.Contexts;
 using System.Threading.Tasks;//Task
 using Microsoft.EntityFrameworkCore;//Include()
 using MyApp.Core.Services;
+using MyApp.Core.Models.DataTransferObjects;
+
 
 namespace MyApp.WebApi.Controllers
 {
@@ -15,25 +17,23 @@ namespace MyApp.WebApi.Controllers
     public class ProductController: Controller
     {
         private IProductService _service;
-        private ShoppingCartContext _context;//Create object of ShoppingCartContext
         
         //Constructor and dependency injection (constructor injection)
-        public ProductController(ShoppingCartContext context, IProductService service)
+        public ProductController(IProductService service)
         {
-            _context = context;
             _service = service;
         }
 
         //Get list of all of the Products
         [HttpGet]
-        public ActionResult <IEnumerable<Product>> Get()
+        public async Task<ActionResult<List<ProductDTO>>> Get()
         {
-           return _service.GetProducts();
+           return await _service.GetProducts();
         }
   
         //GET/id
         [HttpGet("{id}")] //Get only one Product by specifiying it's id
-        public ActionResult<Product> GetById(int id)
+        public ActionResult<ProductDTO> GetById(int id)
         {
             // Invalid id is negative id
             if(id <= 0)
@@ -57,7 +57,7 @@ namespace MyApp.WebApi.Controllers
         //First check if entered data is valid if valid check the ModelState
         //If ModelState is valid then add product to database
         [HttpPost]
-        public async Task<ActionResult> Post(Product product)
+        public async Task<ActionResult> Post(ProductDTO product)
         {
             if (product == null)
             {
@@ -79,7 +79,7 @@ namespace MyApp.WebApi.Controllers
         //First check if valid data is entered if valid then check if ModelState is valid
         //If ModelState is valid then check if Product exists in database if exits then update it, and save the changes
         [HttpPut("{id}")]
-        public async Task<ActionResult> Put(Product product)
+        public async Task<ActionResult> Put(ProductDTO product)
         {
           
             //When entered data is not valid
@@ -93,7 +93,7 @@ namespace MyApp.WebApi.Controllers
               return BadRequest(ModelState);//400 status code   
             }
 
-            Product existingProduct = _context.Products.Include(i => i.Category).FirstOrDefault(s => s.ProductId == product.ProductId);
+            //Product existingProduct = _context.Products.Include(i => i.Category).FirstOrDefault(s => s.ProductId == product.ProductId);
         
             if (_service.UpdateProduct(product) == null)
             {
@@ -102,7 +102,7 @@ namespace MyApp.WebApi.Controllers
 
             await _service.UpdateProduct(product);
          
-            return Ok(existingProduct);//Return newly updated Product
+            return Ok(product);//Return newly updated Product
         }
 
         //When we want to delete a Product first we have to check if entered id is valid or not
@@ -113,13 +113,6 @@ namespace MyApp.WebApi.Controllers
         {
             //Invalid data
             if(id == null)
-            {
-                return NotFound();
-            }
-       
-            Product c =_context.Products.FirstOrDefault(n => n.ProductId == id);
-
-            if(c == null)
             {
                 return NotFound();
             }

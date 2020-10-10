@@ -1,10 +1,10 @@
 using System.ComponentModel.DataAnnotations;
 using System.Collections.Generic;
 
-namespace MyApp.Core.Models
+namespace MyApp.Core.Models.DataTransferObjects
 {
     //This is model for Category
-    public class Category
+    public class CategoryDTO
     {
         //Category properties which are columns in the table
         public int CategoryId { get; set; }//Field CategoryId is primary key

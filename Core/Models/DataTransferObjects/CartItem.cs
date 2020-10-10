@@ -1,11 +1,12 @@
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
+using MyApp.Core.Models.DbEntities;
 
-namespace MyApp.Core.Models
+namespace MyApp.Core.Models.DataTransferObjects
 {
     //This is model for CartItem that represents one product in the cart
-    public class CartItem
+    public class CartItemDTO
     {
         [Key]
         public int ProductId { get; set;} //ProductId is both Foreign key and Primary Key
