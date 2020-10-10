@@ -150,11 +150,10 @@ namespace MyApp.UnitTests
         {
             //Arrange
             Mock <ICategoryService> moqRepo = new Mock <ICategoryService>();//Mock is type of our Interface
-
-           // Mock <ICategoryService> m = new Mock <ICategoryService>();
            
             CategoryDTO testData = new CategoryDTO()
             {
+                //since we have identity column then CategoryId will be auto generated
                 CategoryName = "Items" 
             };
 
@@ -163,13 +162,12 @@ namespace MyApp.UnitTests
             CategoryController controller = new CategoryController(moqRepo.Object);//pass moq object inside controller
 
             //Act
-            ActionResult response = await controller.Post(testData);//Response data
+            ActionResult createdResponse = await controller.Post(testData);//Response data
 
             //Assert
-            Assert.IsType<OkObjectResult>(response);
-            var okResult = Assert.IsType<OkObjectResult>(response);
-            //Assert.True(okResult.Value.CategoryId > 0);
-            Assert.NotEqual(0, (okResult.Value as CategoryDTO).CategoryId);
+            Assert.IsType<OkObjectResult>(createdResponse);
+            var okResult = Assert.IsType<OkObjectResult>(createdResponse);
+            Assert.True((okResult.Value as CategoryDTO).CategoryId > 0); // or we can say : Assert.NotEqual(0, (okResult.Value as CategoryDTO).CategoryId);
     
         }
         
@@ -197,7 +195,6 @@ namespace MyApp.UnitTests
         [Fact]
         public async Task Put_ExistingCategoryPassed_ReturnsOkResult()
         {
-            
             //Arrange
             Mock <ICategoryService> moqRepo = new Mock <ICategoryService>();//Mock is type of our Interface
             CategoryDTO category = new CategoryDTO()
@@ -243,7 +240,6 @@ namespace MyApp.UnitTests
             
             //Arrange
             Mock <ICategoryService> moqRepo = new Mock <ICategoryService>();//Mock is type of our Interface
-            //context.CategoryTestData();//We make sure that dummy data has been added
             moqRepo.Setup(repo => repo.DeleteCategory(1));//access the function inside the service class and specify what it returns
             CategoryController controller = new CategoryController(moqRepo.Object);//pass moq object inside controller
             

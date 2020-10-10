@@ -1,6 +1,7 @@
 using MyApp.Core.Models.DbEntities;
 using Microsoft.EntityFrameworkCore;
 using System.Collections.Generic;
+using MyApp.Core.Models.DataTransferObjects;
 
 namespace MyApp.Core.Contexts
 {
@@ -12,6 +13,7 @@ namespace MyApp.Core.Contexts
         public ShoppingCartContext(DbContextOptions<ShoppingCartContext> options):base(options)
         {  
         } 
+        
         //Create and access the tables in database
         public DbSet<Category> Categories {get;set;} //DbSet of type Category (we called it Categories) 
         public DbSet<Product> Products {get;set;} //DbSet of type Product (we called it Products) 

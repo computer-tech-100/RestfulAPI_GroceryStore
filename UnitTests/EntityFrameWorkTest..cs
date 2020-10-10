@@ -1,3 +1,4 @@
+/*
 using MyApp.Core.Models.DbEntities;
 using Microsoft.EntityFrameworkCore;
 using System.Collections.Generic;
@@ -57,3 +58,4 @@ namespace MyApp.UnitTests
         }
     }
 }
+*/

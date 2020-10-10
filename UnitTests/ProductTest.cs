@@ -129,12 +129,7 @@ namespace MyApp.UnitTests
 
             //This Product does not contain ProductName hence the Product is invalid
             ProductDTO productNameIsMissing = new ProductDTO();
-            //{
-                //ProductId = 2,
-                // Price = 23,
-                //CategoryId = 1
-            //};
-
+           
             moqRepo.Setup(Repo => Repo.CreateProduct(productNameIsMissing));
             ProductController controller = new ProductController(moqRepo.Object);//pass moq object inside controller
             controller.ModelState.AddModelError("ProductName","Required");
@@ -157,7 +152,7 @@ namespace MyApp.UnitTests
             //Arrange
             Mock <IProductService> moqRepo = new Mock <IProductService>();//Mock is type of our Interface
 
-                Category categoryTestData = new Category()
+            Category categoryTestData = new Category()
             {
                 CategoryId = 1, 
                 CategoryName = "Clothes"
@@ -165,7 +160,7 @@ namespace MyApp.UnitTests
             };
             ProductDTO product = new ProductDTO()
             {
-                //ProductId = 2,
+                //ProductId should be auto generated because of Identity column
                 ProductName = "TShirts",
                 Price = 23,
                 CategoryId = 1,
@@ -179,7 +174,8 @@ namespace MyApp.UnitTests
             ActionResult createdResponse = await controller.Post(product);
         
             //Assert
-            Assert.IsType<OkObjectResult>(createdResponse);
+            var okResult = Assert.IsType<OkObjectResult>(createdResponse);
+            Assert.True((okResult.Value as ProductDTO).ProductId > 0);
             
         }
         

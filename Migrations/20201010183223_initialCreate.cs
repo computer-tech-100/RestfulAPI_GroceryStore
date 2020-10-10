@@ -39,7 +39,7 @@ namespace MyApp.Migrations
                 {
                     ProductId = table.Column<int>(nullable: false)
                         .Annotation("Sqlite:Autoincrement", true),
-                    ProductName = table.Column<string>(nullable: true),
+                    ProductName = table.Column<string>(nullable: false),
                     Price = table.Column<decimal>(nullable: false),
                     CategoryId = table.Column<int>(nullable: false)
                 },

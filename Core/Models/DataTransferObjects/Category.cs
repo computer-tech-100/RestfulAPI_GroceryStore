@@ -1,5 +1,6 @@
 using System.ComponentModel.DataAnnotations;
 using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations.Schema;
 
 namespace MyApp.Core.Models.DataTransferObjects
 {
@@ -7,7 +8,7 @@ namespace MyApp.Core.Models.DataTransferObjects
     public class CategoryDTO
     {
         //Category properties which are columns in the table
-        public int CategoryId { get; set; }//Field CategoryId is primary key
+        public int CategoryId { get; set; } = 1;//Field CategoryId is primary key
         //Name field is required and it's length should not be less than 2
         [Required, MinLength(2, ErrorMessage = "Minimum length is 2")]
         public string CategoryName { get; set; }

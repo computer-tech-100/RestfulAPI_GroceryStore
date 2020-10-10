@@ -9,7 +9,7 @@ using MyApp.Core.Contexts;
 namespace MyApp.Migrations
 {
     [DbContext(typeof(ShoppingCartContext))]
-    [Migration("20200823192317_initialCreate")]
+    [Migration("20201010183223_initialCreate")]
     partial class initialCreate
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -18,7 +18,7 @@ namespace MyApp.Migrations
             modelBuilder
                 .HasAnnotation("ProductVersion", "3.1.7");
 
-            modelBuilder.Entity("MyApp.Core.Models.Cart", b =>
+            modelBuilder.Entity("MyApp.Core.Models.DbEntities.Cart", b =>
                 {
                     b.Property<int>("CartId")
                         .ValueGeneratedOnAdd()
@@ -35,7 +35,7 @@ namespace MyApp.Migrations
                     b.ToTable("Carts");
                 });
 
-            modelBuilder.Entity("MyApp.Core.Models.CartItem", b =>
+            modelBuilder.Entity("MyApp.Core.Models.DbEntities.CartItem", b =>
                 {
                     b.Property<int>("ProductId")
                         .HasColumnType("INTEGER");
@@ -56,7 +56,7 @@ namespace MyApp.Migrations
                     b.ToTable("CartItems");
                 });
 
-            modelBuilder.Entity("MyApp.Core.Models.Category", b =>
+            modelBuilder.Entity("MyApp.Core.Models.DbEntities.Category", b =>
                 {
                     b.Property<int>("CategoryId")
                         .ValueGeneratedOnAdd()
@@ -71,7 +71,7 @@ namespace MyApp.Migrations
                     b.ToTable("Categories");
                 });
 
-            modelBuilder.Entity("MyApp.Core.Models.Product", b =>
+            modelBuilder.Entity("MyApp.Core.Models.DbEntities.Product", b =>
                 {
                     b.Property<int>("ProductId")
                         .ValueGeneratedOnAdd()
@@ -84,6 +84,7 @@ namespace MyApp.Migrations
                         .HasColumnType("TEXT");
 
                     b.Property<string>("ProductName")
+                        .IsRequired()
                         .HasColumnType("TEXT");
 
                     b.HasKey("ProductId");
@@ -93,22 +94,22 @@ namespace MyApp.Migrations
                     b.ToTable("Products");
                 });
 
-            modelBuilder.Entity("MyApp.Core.Models.CartItem", b =>
+            modelBuilder.Entity("MyApp.Core.Models.DbEntities.CartItem", b =>
                 {
-                    b.HasOne("MyApp.Core.Models.Cart", null)
+                    b.HasOne("MyApp.Core.Models.DbEntities.Cart", null)
                         .WithMany("AllCartItems")
                         .HasForeignKey("CartId");
 
-                    b.HasOne("MyApp.Core.Models.Product", "Product")
+                    b.HasOne("MyApp.Core.Models.DbEntities.Product", "Product")
                         .WithMany()
                         .HasForeignKey("ProductId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
                 });
 
-            modelBuilder.Entity("MyApp.Core.Models.Product", b =>
+            modelBuilder.Entity("MyApp.Core.Models.DbEntities.Product", b =>
                 {
-                    b.HasOne("MyApp.Core.Models.Category", "Category")
+                    b.HasOne("MyApp.Core.Models.DbEntities.Category", "Category")
                         .WithMany()
                         .HasForeignKey("CategoryId")
                         .OnDelete(DeleteBehavior.Cascade)

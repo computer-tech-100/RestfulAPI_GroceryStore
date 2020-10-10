@@ -149,7 +149,7 @@ namespace MyApp.UnitTests{
 
             CartItemDTO the_CartItem = new CartItemDTO()
             {
-                ProductId = 3,
+                //ProductId should be auto generated because of Identity column
                 Product = product,
                 Price = 3,
                 Quantity = 2
@@ -162,7 +162,8 @@ namespace MyApp.UnitTests{
             ActionResult createdResponse = await controller.Add_To_Cart(the_CartItem);
         
             //Assert
-            Assert.IsType<OkObjectResult>(createdResponse);
+            var okResult = Assert.IsType<OkObjectResult>(createdResponse);
+            Assert.True((okResult.Value as CartItemDTO).ProductId > 0); 
         
         }
         
