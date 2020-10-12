@@ -1,6 +1,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Data.Sqlite;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using Moq;
@@ -8,73 +9,165 @@ using MyApp.Core.Contexts;
 using MyApp.Core.Models.DataTransferObjects;
 using MyApp.Core.Models.DbEntities;
 using MyApp.Core.Services;
-
+using EntityFrameworkCore3Mock;//DbContextMock
 using Xunit;
+using System.Threading.Tasks;
 
 namespace MyApp.UnitTests
 {
-
     public class CategoryServiceTest
     {
+        //Create some dummy options that is type of ShoppingCartContext
+        public DbContextOptions<ShoppingCartContext> myDummyOptions { get; } = new DbContextOptionsBuilder<ShoppingCartContext>().Options;
 
-        //Entity Framework creates only one IServiceProvider for all of the contexts 
-        //Hence our context is going to share same InMemory database
-        //We want to get our context not to be shared between the tests
-        //For this purpose we have to create a new context for each test
-        //Like this : using (var Context = new ShoppingCartContext(CreateNewContext())) { here we implement the AAA pattern }
-        private static DbContextOptions<ShoppingCartContext> CreateNewContext()
-        {
-            //Create a new service provider and new InMemory database 
-            ServiceProvider myServiceProvider = new ServiceCollection()
-            .AddEntityFrameworkInMemoryDatabase()
-            .BuildServiceProvider();
-
-            //Context uses InMemory database and the new service provider 
-            DbContextOptionsBuilder <ShoppingCartContext> my_Builder = new DbContextOptionsBuilder<ShoppingCartContext>();
-            my_Builder.UseInMemoryDatabase("Data Source=MyShoppingCart.db")
-            .UseInternalServiceProvider(myServiceProvider);
-            return my_Builder.Options;
-        }
-        private List<Category> MyCategoryList()
-        {
-            var categoryList = new List<Category>();
-
-            categoryList.Add(new Category()
-            {
-                CategoryId =1,
-                CategoryName = "Items"
-            });
-            categoryList.Add(new Category()
-            {
-                CategoryId =2,
-                CategoryName = "Fruits"
-            });
-
-            return categoryList;  
-        }
-
-        //Test Get() Method
+        //Test GetCategories() method
         [Fact]
-        public void Get_WhenCalled_ReturnsAllCategories()
+        public async Task GetCategories_WhenCalled_ReturnsAllCategories()
         {
-         
-            //using (ShoppingCartContext context = new ShoppingCartContext(CreateNewContext()))
-            //{
             //Arrange
-            Mock <ShoppingCartContext> moqContext = new Mock <ShoppingCartContext>();//Mock is type of our Interface
+            var myDbContextMoq = new DbContextMock<ShoppingCartContext>(myDummyOptions);
 
-            var moqSet = new Mock<DbSet<Category>>();
-             
-            moqContext.Setup(m => m.Categories).Returns(moqSet.Object);
-   
-            CategoryService service = new CategoryService(moqContext.Object);//pass moq object inside CategoryService
+            //Create list of Categories
+            myDbContextMoq.CreateDbSetMock(x => x.Categories, new[]
+            {
+                new Category { CategoryId = 1, CategoryName = "Items" },
+                new Category { CategoryId = 2, CategoryName = "Fruits" },
+                new Category { CategoryId = 3, CategoryName = "Tshirts" }
+            });
 
             //Act
-            var result = service.GetCategories();
+            //Pass myDbContextMoq.Object to the CategoryService class
+            CategoryService service = new CategoryService(myDbContextMoq.Object);
+
+            //Call GetCategories() function
+            var result = await service.GetCategories();
 
             //Assert
             Assert.NotNull(result);
-           //}
+
+        }
+
+        //Test GetCategory() method
+        [Fact]
+        public void GetCategory_WhenExistingCategoryIdPassed_ReturnsRightItem()
+        {
+            //Arrange
+            var myDbContextMoq = new DbContextMock<ShoppingCartContext>(myDummyOptions);
+            myDbContextMoq.CreateDbSetMock(x => x.Categories, new[]
+            {
+                new Category { CategoryId = 1, CategoryName = "Items" },
+                new Category { CategoryId = 2, CategoryName = "Fruits" }
+            });
+
+            myDbContextMoq.Object.Categories.FirstOrDefaultAsync(x => x.CategoryId == 1);
+            myDbContextMoq.Object.Categories.FirstOrDefaultAsync(x => x.CategoryId == 2);
+            CategoryService service = new CategoryService(myDbContextMoq.Object);
+
+            //Act
+            var result1 = service.GetCategory(1);
+            var result2 = service.GetCategory(2);
+
+            //Assert
+            Assert.Equal(result1.CategoryName, "Items");
+            Assert.Equal(result2.CategoryName, "Fruits");
+
+        }
+
+        //Test CreateCategory() method
+        [Fact]
+        public async Task CreateCategory_AddsNewCategoryToCategoriesTable()
+        {
+            //Arrange
+            var myDbContextMoq = new DbContextMock<ShoppingCartContext>(myDummyOptions);
+
+            //Create list of Categories that contains only two Categories : "Items" and "Fruits"
+            myDbContextMoq.CreateDbSetMock(x => x.Categories, new[]
+            {
+                new Category { CategoryId = 1, CategoryName = "Items" },
+                new Category { CategoryId = 2, CategoryName = "Fruits" }
+            });
+        
+            //We want to add this to out list of Categories
+            //Since CreateCategory() method accepts type CategoryDTO we use that type here for our new Category
+            CategoryDTO testDataDTO = new CategoryDTO()
+            {
+                CategoryId = 3,
+                CategoryName = "HardWares" 
+            };
+
+            CategoryService service = new CategoryService(myDbContextMoq.Object);
+
+            //Act
+            await service.CreateCategory(testDataDTO);//call CreateCategory() function and pass the testDataDTO
+
+            //Assert
+            //The size of the Categories list increases to 3 because CreateCategory() method added testDataDTO
+            Assert.Equal(3,myDbContextMoq.Object.Categories.Count());
+
+        }
+         
+        //Test UpdateCategory() method
+        [Fact]
+        public async Task UpdateCategory_EditsTheCategory_AndAddsTheUpdatedCategoryToCategoriesTable()
+        {
+            //Arrange
+            var myDbContextMoq = new DbContextMock<ShoppingCartContext>(myDummyOptions);
+
+            //create list of Categories that contains two Categories: "Items" and "Fruits"
+            myDbContextMoq.CreateDbSetMock(x => x.Categories, new[]
+            {
+                new Category { CategoryId = 1, CategoryName = "Items" },
+                new Category { CategoryId = 2, CategoryName = "Fruits" }
+            });
+
+        
+            CategoryDTO testDataDTO = new CategoryDTO()
+            {
+                CategoryId =1,
+                CategoryName = "Modified Name" 
+            };
+
+            //for example we want to update "Items" Category
+            Category categoryToBeUpdated = myDbContextMoq.Object.Categories.FirstOrDefault(x => x.CategoryId == 1);
+
+            categoryToBeUpdated.CategoryId = testDataDTO.CategoryId;
+
+            CategoryService service = new CategoryService(myDbContextMoq.Object);
+
+            //Act
+            await service.UpdateCategory(testDataDTO);
+
+            //Assert
+            //CategoryName changed from "Items" to "Modified Name"
+            Assert.Equal("Modified Name",categoryToBeUpdated.CategoryName);
+
+        }
+           
+        //Test DeleteCategory() method
+        [Fact]
+        public async Task DeleteCategory_RemovesThatCategoryFromCategoriesTable()
+        {
+            //Arrange
+            var myDbContextMoq = new DbContextMock<ShoppingCartContext>(myDummyOptions);
+
+            //create list of Categories that contains two Categories: Items and Fruits
+            myDbContextMoq.CreateDbSetMock(x => x.Categories, new[]
+            {
+                new Category { CategoryId = 1, CategoryName = "Items" },
+                new Category { CategoryId = 2, CategoryName = "Fruits" }
+            });
+
+            //for example we want to delete "Items" Category
+            Category categoryToBeDeleted = myDbContextMoq.Object.Categories.First(x => x.CategoryId == 1);
+
+            CategoryService service = new CategoryService(myDbContextMoq.Object);
+
+            //Act
+            await service.DeleteCategory(1);//remove "Items" Category
+             
+            //Assert
+            //removing "items" Category causes that our list size becomes 1
+            Assert.Equal(1,myDbContextMoq.Object.Categories.Count());
 
         }
     }

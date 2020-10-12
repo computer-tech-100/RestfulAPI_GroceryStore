@@ -236,7 +236,6 @@ namespace MyApp.UnitTests
         [Fact]
         public async Task Remove_ExistingIntIdPassed_ReturnsOkResult()
         {
-            
             //Arrange
             Mock <ICategoryService> moqRepo = new Mock <ICategoryService>();//Mock is type of our Interface
             moqRepo.Setup(repo => repo.DeleteCategory(1));//access the function inside the service class and specify what it returns

@@ -36,6 +36,33 @@
           "lib/netstandard1.5/Castle.Core.dll": {}
         }
       },
+      "EntityFrameworkCore3Mock.Moq/1.0.0.3": {
+        "type": "package",
+        "dependencies": {
+          "Castle.Core": "4.4.0",
+          "EntityFrameworkCore3Mock.Shared": "1.0.0.3",
+          "Microsoft.EntityFrameworkCore": "3.0.0",
+          "Moq": "4.13.1"
+        },
+        "compile": {
+          "lib/netstandard2.1/EntityFrameworkCore3Mock.Moq.dll": {}
+        },
+        "runtime": {
+          "lib/netstandard2.1/EntityFrameworkCore3Mock.Moq.dll": {}
+        }
+      },
+      "EntityFrameworkCore3Mock.Shared/1.0.0.3": {
+        "type": "package",
+        "dependencies": {
+          "Microsoft.EntityFrameworkCore": "3.0.0"
+        },
+        "compile": {
+          "lib/netstandard2.1/EntityFrameworkCore3Mock.Shared.dll": {}
+        },
+        "runtime": {
+          "lib/netstandard2.1/EntityFrameworkCore3Mock.Shared.dll": {}
+        }
+      },
       "Microsoft.Bcl.AsyncInterfaces/1.1.1": {
         "type": "package",
         "compile": {
@@ -2264,6 +2291,30 @@
         "lib/netstandard1.5/Castle.Core.dll",
         "lib/netstandard1.5/Castle.Core.xml",
         "readme.txt"
+      ]
+    },
+    "EntityFrameworkCore3Mock.Moq/1.0.0.3": {
+      "sha512": "U3E4hDZJ16W/LdVUdY/1OxLrtAYLLS8waJD1GG5vryacHQUHKpnZqWe4MjuQ9fjrpnBNbM2R6FqUH93bITm5/Q==",
+      "type": "package",
+      "path": "entityframeworkcore3mock.moq/1.0.0.3",
+      "files": [
+        ".nupkg.metadata",
+        ".signature.p7s",
+        "entityframeworkcore3mock.moq.1.0.0.3.nupkg.sha512",
+        "entityframeworkcore3mock.moq.nuspec",
+        "lib/netstandard2.1/EntityFrameworkCore3Mock.Moq.dll"
+      ]
+    },
+    "EntityFrameworkCore3Mock.Shared/1.0.0.3": {
+      "sha512": "gTP3bgN6c262eLW/vdND3vDOtClQ3HL7dR4ChUZIB32gtGzrVAqBNjtJVTGOEDJSaFlnzu2c0U08/Q8jgXzvCQ==",
+      "type": "package",
+      "path": "entityframeworkcore3mock.shared/1.0.0.3",
+      "files": [
+        ".nupkg.metadata",
+        ".signature.p7s",
+        "entityframeworkcore3mock.shared.1.0.0.3.nupkg.sha512",
+        "entityframeworkcore3mock.shared.nuspec",
+        "lib/netstandard2.1/EntityFrameworkCore3Mock.Shared.dll"
       ]
     },
     "Microsoft.Bcl.AsyncInterfaces/1.1.1": {
@@ -7228,6 +7279,7 @@
   "projectFileDependencyGroups": {
     ".NETCoreApp,Version=v3.1": [
       "AutoMapper >= 10.0.0",
+      "EntityFrameworkCore3Mock.Moq >= 1.0.0.3",
       "Microsoft.EntityFrameworkCore.InMemory >= 3.1.7",
       "Microsoft.EntityFrameworkCore.Sqlite >= 3.1.5",
       "Microsoft.EntityFrameworkCore.Tools >= 3.1.5",
@@ -7279,6 +7331,10 @@
           "AutoMapper": {
             "target": "Package",
             "version": "[10.0.0, )"
+          },
+          "EntityFrameworkCore3Mock.Moq": {
+            "target": "Package",
+            "version": "[1.0.0.3, )"
           },
           "Microsoft.EntityFrameworkCore.InMemory": {
             "target": "Package",

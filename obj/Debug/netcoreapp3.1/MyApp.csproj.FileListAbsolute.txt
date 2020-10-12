@@ -459,3 +459,5 @@
 /Users/moza/Desktop/MyApp/bin/Debug/netcoreapp3.1/Castle.Core.dll
 /Users/moza/Desktop/MyApp/bin/Debug/netcoreapp3.1/Moq.dll
 /Users/moza/Desktop/MyApp/bin/Debug/netcoreapp3.1/AutoMapper.dll
+/Users/moza/Desktop/MyApp/bin/Debug/netcoreapp3.1/EntityFrameworkCore3Mock.Moq.dll
+/Users/moza/Desktop/MyApp/bin/Debug/netcoreapp3.1/EntityFrameworkCore3Mock.Shared.dll
