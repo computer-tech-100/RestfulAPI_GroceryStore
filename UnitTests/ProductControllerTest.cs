@@ -20,7 +20,7 @@ using MyApp.Core.Models.DbEntities;
 namespace MyApp.UnitTests
 {
 
-    public class TestProduct
+    public class ProductControllerTest
     {
         //dummy data
         private List<ProductDTO> MyProductList()

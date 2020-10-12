@@ -18,7 +18,7 @@ using MyApp.Core.Models.DbEntities;
 //The app should fail gracefully
 //Consider all possible aspects that user : test cases with all possible input and output
 namespace MyApp.UnitTests{
-    public class TestCartItem
+    public class CartItemControllerTest
     {
         //dummy data
         private List<CartItemDTO> MyCartItemList()

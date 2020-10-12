@@ -9,7 +9,7 @@ using MyApp.Core.Contexts;
 namespace MyApp.Migrations
 {
     [DbContext(typeof(ShoppingCartContext))]
-    [Migration("20201010183223_initialCreate")]
+    [Migration("20201011001200_initialCreate")]
     partial class initialCreate
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)

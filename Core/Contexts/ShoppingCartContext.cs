@@ -15,7 +15,7 @@ namespace MyApp.Core.Contexts
         } 
         
         //Create and access the tables in database
-        public DbSet<Category> Categories {get;set;} //DbSet of type Category (we called it Categories) 
+        public virtual DbSet<Category> Categories {get;set;} //DbSet of type Category (we called it Categories) 
         public DbSet<Product> Products {get;set;} //DbSet of type Product (we called it Products) 
         public DbSet<CartItem> CartItems {get; set;} //DbSet of type CartItem (we called it CartItems) 
         public DbSet<Cart> Carts {get; set;} //DbSet of type Cart (we called it Carts)        

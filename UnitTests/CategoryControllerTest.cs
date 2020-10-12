@@ -14,13 +14,12 @@ using System.ComponentModel.DataAnnotations;
 using MyApp.Core.Services;
 using Moq;
 using MyApp.Core.Models.DataTransferObjects;
-using MyApp.Core.Models.DbEntities;
 
 //The app should fail gracefully
 //Consider all possible aspects that user : test cases with all possible input and output
 namespace MyApp.UnitTests
 {
-    public class TestCategory
+    public class CategoryControllerTest
     {
         //dummy data
         private List<CategoryDTO> MyCategoryList()
@@ -167,7 +166,7 @@ namespace MyApp.UnitTests
             //Assert
             Assert.IsType<OkObjectResult>(createdResponse);
             var okResult = Assert.IsType<OkObjectResult>(createdResponse);
-            Assert.True((okResult.Value as CategoryDTO).CategoryId > 0); // or we can say : Assert.NotEqual(0, (okResult.Value as CategoryDTO).CategoryId);
+            Assert.True((okResult.Value as CategoryDTO).CategoryId > 0); // or we can say : Assert.NotEqual(0, (okResult.Value as CategoryDTO).CategoryId); 
     
         }
         

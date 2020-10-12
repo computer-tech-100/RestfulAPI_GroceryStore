@@ -1,4 +1,4 @@
-/*
+
 using MyApp.Core.Models.DbEntities;
 using Microsoft.EntityFrameworkCore;
 using System.Collections.Generic;
@@ -16,7 +16,7 @@ namespace MyApp.UnitTests
 {
     public class MoqEntityFramework
     {
-        [Fact]
+        //[Fact]
         public void MoqDbSet()
         {
             //Arrange
@@ -54,8 +54,8 @@ namespace MyApp.UnitTests
             //setup mocked version 
             var moqContext = new Mock<ShoppingCartContext>();
             moqContext.Setup(m => m.Categories).Returns(moqSet.Object);
+
             
         }
     }
 }
-*/

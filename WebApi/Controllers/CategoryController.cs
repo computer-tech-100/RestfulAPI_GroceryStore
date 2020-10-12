@@ -1,12 +1,9 @@
 using Microsoft.AspNetCore.Mvc; // controller class
 using System.Collections.Generic;//for retrieving data from database / IEnumerable
 using System.Linq;//ToList()
-using MyApp.Core.Models;
-using MyApp.Core.Contexts;
 using System.Threading.Tasks;//Task
 using MyApp.Core.Services;
 using MyApp.Core.Models.DataTransferObjects;
-
 
 namespace MyApp.WebApi.Controllers
 {
