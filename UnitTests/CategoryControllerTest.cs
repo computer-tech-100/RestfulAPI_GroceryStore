@@ -149,15 +149,16 @@ namespace MyApp.UnitTests
         {
             //Arrange
             Mock <ICategoryService> moqRepo = new Mock <ICategoryService>();//Mock is type of our Interface
-           
+         
             CategoryDTO testData = new CategoryDTO()
             {
-                //since we have identity column then CategoryId will be auto generated
+                CategoryId =1,
                 CategoryName = "Items" 
             };
-
-            moqRepo.Setup(repo => repo.CreateCategory(testData));//access the function inside the service class and specify what it returns
-
+            //Return should give you back some random number for CategoryId
+            //moqRepo.Setup(x => x.CreateCategory(testData)).Returns(() => Task.FromResult(testData));
+            moqRepo.Setup(i => i.CreateCategory(It.IsAny<CategoryDTO>())).Returns(() => Task.FromResult(testData));
+            
             CategoryController controller = new CategoryController(moqRepo.Object);//pass moq object inside controller
 
             //Act

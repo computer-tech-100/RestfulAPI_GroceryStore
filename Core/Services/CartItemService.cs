@@ -31,7 +31,7 @@ namespace MyApp.Core.Services
                 Quantity = c.Quantity
 
             }).ToList();
-           
+           /*
             var myProduct = (await _context.Products.Include(i => i.Category).ToListAsync()).Select(c => new ProductDTO
             {
                 ProductId = c.ProductId,
@@ -41,6 +41,7 @@ namespace MyApp.Core.Services
                 Category = c.Category
 
             }).ToList();
+            */
 
             return myCartItem; 
         }
@@ -57,7 +58,7 @@ namespace MyApp.Core.Services
                 Quantity = c.Quantity
 
             }).FirstOrDefault(p => p.ProductId == id);
-
+/*
             var myProduct = _context.Products.Include(i => i.Category).Select(c => new ProductDTO
             {
                 ProductId = c.ProductId,
@@ -67,6 +68,7 @@ namespace MyApp.Core.Services
                 Category = c.Category
 
             }).ToList();
+            */
 
             //CartItem my_CartItem = _context.CartItems.Include(i => i.Product).FirstOrDefault(p => p.ProductId == id);
             //List <Product> MyProduct = _context.Products.Include(i => i.Category).ToList();//Each Product should show it's related Category
@@ -87,18 +89,19 @@ namespace MyApp.Core.Services
 
             List <CartItem> my_CartItem = _context.CartItems.Include(i => i.Product).ToList();
 
-            List <Product> myProduct = _context.Products.Include(i => i.Category).ToList();//Each Product should show it's related Category
+            //List <Product> myProduct = _context.Products.Include(i => i.Category).ToList();//Each Product should show it's related Category
 
             cartItem.ProductId = myCartItem.ProductId;
 
-            return cartItem;   
+            return cartItem;  
+          
         }  
 
         public async Task<CartItemDTO> UpdateCartItem(CartItemDTO cartItem)
         {
             var existingCartItem= _context.CartItems.Include(i => i.Product).Single(e => e.ProductId == cartItem.ProductId);
     
-            List <Product> product = _context.Products.Include(i => i.Category).ToList();
+            //List <Product> product = _context.Products.Include(i => i.Category).ToList();
 
             existingCartItem.Quantity = cartItem.Quantity;
 

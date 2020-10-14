@@ -160,14 +160,15 @@ namespace MyApp.UnitTests
             };
             ProductDTO product = new ProductDTO()
             {
-                //ProductId should be auto generated because of Identity column
+                ProductId = 1,
                 ProductName = "TShirts",
                 Price = 23,
                 CategoryId = 1,
                 Category = categoryTestData
             };
 
-            moqRepo.Setup(repo => repo.CreateProduct(product));//access the function inside the service class and specify what it returns
+            //access the function inside the service class and specify what it returns
+            moqRepo.Setup(i => i.CreateProduct(It.IsAny<ProductDTO>())).Returns(() => Task.FromResult(product));
             ProductController controller = new ProductController(moqRepo.Object);//pass moq object inside controller
         
             //Act

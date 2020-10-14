@@ -65,8 +65,9 @@ namespace MyApp.Core.Services
             //we want to pass CategoryId back with our DTO
             //this is how we add CategoryId to our DTO and return it
             category.CategoryId = myCategory.CategoryId;
+            return category;
             
-            return category;         
+              
         }  
 
         public async Task<CategoryDTO> UpdateCategory(CategoryDTO category)

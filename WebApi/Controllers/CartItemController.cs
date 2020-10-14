@@ -9,7 +9,6 @@ using System;
 using MyApp.Core.Services;
 using MyApp.Core.Models.DataTransferObjects;
 
-
 namespace MyApp.WebApi.Controllers
 {
 

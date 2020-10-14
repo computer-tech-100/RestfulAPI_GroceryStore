@@ -149,13 +149,14 @@ namespace MyApp.UnitTests{
 
             CartItemDTO the_CartItem = new CartItemDTO()
             {
-                //ProductId should be auto generated because of Identity column
+                ProductId = 3,
                 Product = product,
                 Price = 3,
                 Quantity = 2
             };
 
-            moqRepo.Setup(repo => repo.CreateCartItem(the_CartItem));//access the function inside the service class and specify what it returns
+            //access the function inside the service class and specify what it returns
+            moqRepo.Setup(i => i.CreateCartItem(It.IsAny<CartItemDTO>())).Returns(() => Task.FromResult(the_CartItem));
             CartItemController controller = new CartItemController(moqRepo.Object);//pass context and moq object inside controller
 
             //Act

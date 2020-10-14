@@ -59,8 +59,6 @@ namespace MyApp.UnitTests
                 new Category { CategoryId = 2, CategoryName = "Fruits" }
             });
 
-            myDbContextMoq.Object.Categories.FirstOrDefaultAsync(x => x.CategoryId == 1);
-            myDbContextMoq.Object.Categories.FirstOrDefaultAsync(x => x.CategoryId == 2);
             CategoryService service = new CategoryService(myDbContextMoq.Object);
 
             //Act
@@ -68,8 +66,8 @@ namespace MyApp.UnitTests
             var result2 = service.GetCategory(2);
 
             //Assert
-            Assert.Equal(result1.CategoryName, "Items");
-            Assert.Equal(result2.CategoryName, "Fruits");
+            Assert.Equal("Items",result1.CategoryName);
+            Assert.Equal("Fruits",result2.CategoryName);
 
         }
 
@@ -87,7 +85,7 @@ namespace MyApp.UnitTests
                 new Category { CategoryId = 2, CategoryName = "Fruits" }
             });
         
-            //We want to add this to out list of Categories
+            //We want to add Hardwares to our list of Categories
             //Since CreateCategory() method accepts type CategoryDTO we use that type here for our new Category
             CategoryDTO testDataDTO = new CategoryDTO()
             {
@@ -123,19 +121,16 @@ namespace MyApp.UnitTests
         
             CategoryDTO testDataDTO = new CategoryDTO()
             {
-                CategoryId =1,
+                CategoryId = 1,
                 CategoryName = "Modified Name" 
             };
-
-            //for example we want to update "Items" Category
-            Category categoryToBeUpdated = myDbContextMoq.Object.Categories.FirstOrDefault(x => x.CategoryId == 1);
-
-            categoryToBeUpdated.CategoryId = testDataDTO.CategoryId;
 
             CategoryService service = new CategoryService(myDbContextMoq.Object);
 
             //Act
+            //for example we want to update "Items" Category
             await service.UpdateCategory(testDataDTO);
+            Category categoryToBeUpdated = myDbContextMoq.Object.Categories.FirstOrDefault(x => x.CategoryId == 1);
 
             //Assert
             //CategoryName changed from "Items" to "Modified Name"
@@ -157,12 +152,10 @@ namespace MyApp.UnitTests
                 new Category { CategoryId = 2, CategoryName = "Fruits" }
             });
 
-            //for example we want to delete "Items" Category
-            Category categoryToBeDeleted = myDbContextMoq.Object.Categories.First(x => x.CategoryId == 1);
-
             CategoryService service = new CategoryService(myDbContextMoq.Object);
 
             //Act
+            //for example we want to delete "Items" Category
             await service.DeleteCategory(1);//remove "Items" Category
              
             //Assert
