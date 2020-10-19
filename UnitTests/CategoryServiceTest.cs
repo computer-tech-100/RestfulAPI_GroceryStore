@@ -35,12 +35,12 @@ namespace MyApp.UnitTests
                 new Category { CategoryId = 3, CategoryName = "Tshirts" }
             });
 
-            //Act
+            
             //Pass myDbContextMoq.Object to the CategoryService class
             CategoryService service = new CategoryService(myDbContextMoq.Object);
 
-            //Call GetCategories() function
-            var result = await service.GetCategories();
+            //Act
+            var result = await service.GetCategories();//Call GetCategories() function
 
             //Assert
             Assert.NotNull(result);

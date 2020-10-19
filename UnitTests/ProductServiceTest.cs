@@ -78,7 +78,7 @@ namespace MyApp.UnitTests
             //Arrange
             var myDbContextMoq = new DbContextMock<ShoppingCartContext>(myDummyOptions);
 
-            //Create list of Products that contains only two Products : "Milk" and "Oranges
+            //Create list of Products that contains only two Products : "Milk" and "Oranges"
             myDbContextMoq.CreateDbSetMock(x => x.Products, new[]
             {
                 new Product { ProductId = 1, ProductName = "Milk", Price = 3, CategoryId = 1 },
@@ -113,7 +113,7 @@ namespace MyApp.UnitTests
             //Arrange
             var myDbContextMoq = new DbContextMock<ShoppingCartContext>(myDummyOptions);
 
-            //Create list of Products that contains only two Products : "Milk" and "Oranges
+            //Create list of Products that contains only two Products : "Milk" and "Oranges"
             myDbContextMoq.CreateDbSetMock(x => x.Products, new[]
             {
                 new Product { ProductId = 1, ProductName = "Milk", Price = 3, CategoryId = 1 },
@@ -149,7 +149,7 @@ namespace MyApp.UnitTests
             //Arrange
             var myDbContextMoq = new DbContextMock<ShoppingCartContext>(myDummyOptions);
 
-            //Create list of Products that contains only two Products : "Milk" and "Oranges
+            //Create list of Products that contains only two Products : "Milk" and "Oranges"
             myDbContextMoq.CreateDbSetMock(x => x.Products, new[]
             {
                 new Product { ProductId = 1, ProductName = "Milk", Price = 3, CategoryId = 1 },

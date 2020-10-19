@@ -83,16 +83,16 @@ namespace MyApp.UnitTests{
 
         //Test Get() Method
         [Fact]
-        public void GetCart_WhenCalled_ReturnsAllCartItems_And_GrandTotal()
+        public async Task GetCart_WhenCalled_ReturnsAllCartItems_And_GrandTotal()
         {
             //Arrange
             Mock <ICartService> moqRepo = new Mock <ICartService>();//Mock is type of our Interface
 
-            moqRepo.Setup(repo => repo.GetMyCart()).Returns(MyCart());//access the function inside the service class and specify what it returns
+            moqRepo.Setup(repo => repo.GetMyCart()).ReturnsAsync(MyCart());//access the function inside the service class and specify what it returns
             CartController controller = new CartController(moqRepo.Object);//pass moq object inside controller
 
             //Act
-            var results = controller.GetCart();//call Get() function inside Cart controller
+            var results = await controller.GetCart();//call Get() function inside Cart controller
         
             //Assert
             Assert.NotNull(results);//make sure that Get Method returns value 

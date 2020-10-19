@@ -10,8 +10,6 @@ using MyApp.Core.Models.DataTransferObjects;
 using MyApp.Core.Models.DbEntities;
 using AutoMapper;
 
-
-
 namespace MyApp.Core.Services
 {
     public class CategoryService: ICategoryService
@@ -47,7 +45,7 @@ namespace MyApp.Core.Services
             return getCategoryById;
         }
 
-        public async Task <CategoryDTO> CreateCategory(CategoryDTO category)
+        public async Task CreateCategory(CategoryDTO category)
         {
             //create new object
             Category myCategory = new Category()
@@ -65,11 +63,9 @@ namespace MyApp.Core.Services
             //we want to pass CategoryId back with our DTO
             //this is how we add CategoryId to our DTO and return it
             category.CategoryId = myCategory.CategoryId;
-            return category;
-            
-              
-        }  
 
+        }  
+        
         public async Task<CategoryDTO> UpdateCategory(CategoryDTO category)
         {
             var my_category = _context.Categories.Single(e => e.CategoryId == category.CategoryId);
@@ -96,7 +92,7 @@ namespace MyApp.Core.Services
     {
         Task<List<CategoryDTO>> GetCategories();
         CategoryDTO GetCategory(int id);
-        Task <CategoryDTO> CreateCategory(CategoryDTO category);
+        Task CreateCategory(CategoryDTO category);
         Task<CategoryDTO> UpdateCategory(CategoryDTO category);
         Task DeleteCategory(int? id);
     }

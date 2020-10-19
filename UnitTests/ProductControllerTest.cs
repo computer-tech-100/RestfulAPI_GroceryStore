@@ -158,6 +158,7 @@ namespace MyApp.UnitTests
                 CategoryName = "Clothes"
             
             };
+
             ProductDTO product = new ProductDTO()
             {
                 ProductId = 1,
@@ -211,6 +212,7 @@ namespace MyApp.UnitTests
                 CategoryId = 2,
                 CategoryName ="Fruits"
             };
+
             ProductDTO product = new ProductDTO()
             {
                 ProductId = 1,
@@ -219,6 +221,7 @@ namespace MyApp.UnitTests
                 CategoryId = 2,
                 Category = the_Category 
             };
+            
             moqRepo.Setup(repo => repo.UpdateProduct(product));//access the function inside the service class and specify what it returns
             ProductController controller = new ProductController(moqRepo.Object);//pass moq object inside controller
             

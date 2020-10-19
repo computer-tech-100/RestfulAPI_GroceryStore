@@ -40,12 +40,10 @@ namespace MyApp.UnitTests
             return categoryList;  
         }
         
-
         //Test Get() Method
         [Fact]
         public async Task Get_WhenCalled_ReturnsAllCategories()
         {
-            
             //Arrange
             Mock <ICategoryService> moqRepo = new Mock <ICategoryService>();//Mock is type of our Interface
             moqRepo.Setup(repo => repo.GetCategories()).ReturnsAsync(MyCategoryList());//access the function inside the service class and specify what it returns
@@ -141,7 +139,6 @@ namespace MyApp.UnitTests
             
         }
         
-
         //Test Post() Method 
         //When valid object is passed 
         [Fact]

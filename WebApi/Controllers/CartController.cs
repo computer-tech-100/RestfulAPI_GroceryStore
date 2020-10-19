@@ -25,9 +25,9 @@ namespace MyApp.WebApi.Controllers
         
         //Get list of all the Products inside cart
        [HttpGet]
-        public CartDTO GetCart()
+        public async Task<CartDTO> GetCart()
         {
-            return _service.GetMyCart();
+            return await _service.GetMyCart();
         }     
     }
 }

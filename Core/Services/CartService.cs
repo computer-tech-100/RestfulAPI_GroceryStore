@@ -18,10 +18,10 @@ namespace MyApp.Core.Services
             _context = context;
         }
         
-        public CartDTO GetMyCart()
-        {/*
+        public async Task <CartDTO> GetMyCart()
+        {
             //show the list of cart items (each cart item is a Product and each Product has a Category)
-            var cart_Items = _context.CartItems.Include(i => i.Product).ToList().Select(c => new CartItemDTO
+             var cartItems = (await _context.CartItems.Include(i => i.Product).Include(i => i.Product.Category).ToListAsync()).Select(c => new CartItemDTO
             {
                 ProductId = c.ProductId,
                 Product = c.Product,
@@ -29,29 +29,13 @@ namespace MyApp.Core.Services
                 Quantity = c.Quantity
 
             }).ToList();
-            */
-            
-           /*
-            var myProduct = _context.Products.Include(i => i.Category).ToList().Select(c => new ProductDTO
-            {
-                ProductId = c.ProductId,
-                ProductName = c.ProductName,
-                Price = c.Price,
-                CategoryId = c.CategoryId,
-                Category = c.Category
 
-            }).ToList();
-            */
-             List<CartItemDTO> cart_Items = new List<CartItemDTO>();
-
-           
-
+            //myCart contains list of cart items and Grand Total
             CartDTO myCart = new CartDTO()//create object 
             {
-                //MyCart contains list of cart items and Grand Total
-                
-                AllCartItems =  cart_Items,
-                GrandTotal = cart_Items.Sum(x => x.Price * x.Quantity)//calculate Grandtotal  
+            
+                AllCartItems =  cartItems,
+                GrandTotal = cartItems.Sum(x => x.Price * x.Quantity)//calculate Grandtotal  
             };
 
             return myCart;
@@ -60,6 +44,6 @@ namespace MyApp.Core.Services
     
     public interface ICartService
     {
-        CartDTO GetMyCart();
+        Task<CartDTO> GetMyCart();
     }   
 }

@@ -49,34 +49,40 @@ namespace MyApp.Core.Services
             return myProduct;
         }
 
-        public async Task <ProductDTO> CreateProduct(ProductDTO product)
+        public async Task CreateProduct(ProductDTO product)
         {
+
             Product myProduct = new Product()
             {
+                //ProductId is Auto generated
                 ProductName = product.ProductName,
                 Price = product.Price,
                 CategoryId = product.CategoryId,
                 Category = product.Category
             };
-
+        
             await _context.Products.AddAsync(myProduct);//Add Product to Products table
 
             await _context.SaveChangesAsync();//Save all the changes
 
-            _context.Products.Include(i => i.Category).ToList();
-
+            await _context.Products.Include(i => i.Category).ToListAsync();
+      
             product.ProductId = myProduct.ProductId;
 
-            return product;         
+            product.Category = myProduct.Category;//this makes the Category not become null
+        
         }  
 
         public async Task<ProductDTO> UpdateProduct(ProductDTO product)
         {
+
             var existingProduct = _context.Products.Include(i => i.Category).Single(e => e.ProductId == product.ProductId);
     
             existingProduct.ProductName = product.ProductName;
 
             existingProduct.Price = product.Price; 
+
+            product.Category = existingProduct.Category;
             
             await _context.SaveChangesAsync();
             
@@ -97,7 +103,7 @@ namespace MyApp.Core.Services
     {
         Task<List<ProductDTO>> GetProducts();
         ProductDTO GetProduct(int id);
-        Task <ProductDTO> CreateProduct(ProductDTO product);
+        Task CreateProduct(ProductDTO product);
         Task<ProductDTO> UpdateProduct(ProductDTO product);
         Task DeleteProduct(int? id);
     }

@@ -24,7 +24,7 @@ namespace MyApp.UnitTests
         [Fact]
         public void GetMyCart_WhenCalled_ReturnsAllCartItems()
         {
-            
+          
             //Arrange
             var myDbContextMoq = new DbContextMock<ShoppingCartContext>(myDummyOptions);
 
@@ -51,12 +51,11 @@ namespace MyApp.UnitTests
                 new Cart { CartId = 1, CartName = "My Cart",  AllCartItems = All_Cart_Items, GrandTotal = 16 }
             });
 
-            //Act
             //Pass myDbContextMoq.Object to the CartService class
             CartService service = new CartService(myDbContextMoq.Object);
 
-            //Call GetMyCart() function
-            var result = service.GetMyCart();
+            //Act
+            var result = service.GetMyCart();//Call GetMyCart() function
 
             //Assert
             Assert.NotNull(result);
